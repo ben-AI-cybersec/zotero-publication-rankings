@@ -32,16 +32,13 @@ $filesToInclude = @(
     "bootstrap.js",
     "logo.svg",
     "preferences.xhtml",
-    "content\data.js",
-    "content\rankings.js"
+    "data.js",
+    "rankings.js"
 )
-
-# Copy directories - removed since we're copying files individually
-# $dirsToInclude = @("content")
 
 foreach ($file in $filesToInclude) {
     $sourcePath = Join-Path $pluginDir $file
-    $destPath = Join-Path $tempDir (Split-Path $file -Leaf)
+    $destPath = Join-Path $tempDir $file
     
     if (Test-Path $sourcePath) {
         Copy-Item $sourcePath $destPath
@@ -50,21 +47,6 @@ foreach ($file in $filesToInclude) {
         Write-Host "Warning: $file not found" -ForegroundColor Yellow
     }
 }
-
-# Removed directory copying since we copy files individually now
-<#
-foreach ($dir in $dirsToInclude) {
-    $sourcePath = Join-Path $pluginDir $dir
-    $destPath = Join-Path $tempDir $dir
-    
-    if (Test-Path $sourcePath) {
-        Copy-Item $sourcePath $destPath -Recurse
-        Write-Host "Added: $dir\"
-    } else {
-        Write-Host "Warning: $dir not found" -ForegroundColor Yellow
-    }
-}
-#>
 
 # Create XPI file (ZIP archive with .xpi extension)
 Write-Host "`nCreating XPI archive..."

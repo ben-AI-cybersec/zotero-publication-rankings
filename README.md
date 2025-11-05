@@ -81,12 +81,10 @@ sjr-core-rankings-zotero-plugin/
 │   ├── extract_sjr.py               # Extract SJR rankings
 │   ├── extract_full_core.py         # Extract CORE rankings
 │   └── generate_data_js.py          # Combine into data.js
-├── content/                          # Plugin content (loaded by bootstrap)
-│   ├── data.js                      # Rankings data (2.2MB)
-│   └── rankings.js                  # Main plugin logic (copied during build)
 ├── manifest.json                     # Plugin metadata
 ├── bootstrap.js                      # Plugin lifecycle hooks
-├── rankings.js                       # Source: Main plugin logic
+├── rankings.js                       # Main plugin logic
+├── data.js                           # Rankings data (2.2MB)
 ├── preferences.xhtml                 # Settings UI
 ├── logo.svg                          # Plugin icon
 ├── build.ps1                         # Build script (creates XPI)
@@ -95,8 +93,6 @@ sjr-core-rankings-zotero-plugin/
 ├── INSTALL.md                        # Installation guide
 └── LICENSE                           # GPLv3 license
 ```
-
-**Note:** The `content/` directory is used for files that are loaded by the bootstrap script. During the build process, `rankings.js` is copied to `content/` along with `data.js`.
 
 ## Data Sources
 
