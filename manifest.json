@@ -1,0 +1,20 @@
+{
+	"manifest_version": 2,
+	"name": "SJR & CORE Rankings",
+	"version": "1.1.1",
+	"description": "Displays SJR journal rankings and CORE conference rankings in a custom Ranking column",
+	"homepage_url": "https://github.com/Ben-AI-Cybersec/zotero-rankings",
+	"author": "Ben Stephens",
+	"icons": {
+		"48": "logo.svg",
+		"96": "logo.svg"
+	},
+	"applications": {
+		"zotero": {
+			"id": "sjr-core-rankings@zotero.org",
+			"update_url": "https://raw.githubusercontent.com/Ben-AI-Cybersec/zotero-rankings/main/updates.json",
+			"strict_min_version": "7.0",
+			"strict_max_version": "7.*"
+		}
+	}
+}
