@@ -313,30 +313,38 @@ ZoteroRankings = {
 					}
 				}
 				
-				// Try word overlap matching for SJR conference proceedings
-				var cleanedSearch = this.normalizeString(this.cleanConferenceTitle(normalizedTitle));
-				var searchWords = cleanedSearch.split(' ').filter(function(w) { return w.length > 3; });
+			// Try word overlap matching for SJR conference proceedings
+			// This is aggressive, so use high threshold to avoid false positives
+			var cleanedSearch = this.normalizeString(this.cleanConferenceTitle(normalizedTitle));
+			var searchWords = cleanedSearch.split(' ').filter(function(w) { return w.length > 3; });
+			
+			for (var title in sjrRankings) {
+				var cleanedSjr = this.normalizeString(title);
+				var sjrWords = cleanedSjr.split(' ').filter(function(w) { return w.length > 3; });
 				
-				for (var title in sjrRankings) {
-					var cleanedSjr = this.normalizeString(title);
-					var sjrWords = cleanedSjr.split(' ').filter(function(w) { return w.length > 3; });
-					
-					// Count how many significant words overlap
-					var matchCount = 0;
-					for (var k = 0; k < sjrWords.length; k++) {
-						if (searchWords.indexOf(sjrWords[k]) !== -1) {
-							matchCount++;
-						}
-					}
-					
-					// If most words overlap (70%+) and it looks like a conference, match it
-					if (sjrWords.length >= 4 && matchCount / sjrWords.length >= 0.7) {
-						var sjrData = sjrRankings[title];
-						return sjrData.quartile + " " + sjrData.sjr;
+				// Count how many significant words overlap
+				var matchCount = 0;
+				for (var k = 0; k < sjrWords.length; k++) {
+					if (searchWords.indexOf(sjrWords[k]) !== -1) {
+						matchCount++;
 					}
 				}
 				
-				// If not found in journals, try CORE conference rankings (if enabled)
+				// Use stricter criteria to avoid false positives:
+				// 1. Require 85% overlap from SJR side
+				// 2. Require 80% overlap from search side (allows "Proceedings of...")
+				// 3. Require longer titles (5+ words instead of 4+)
+				var sjrOverlap = matchCount / sjrWords.length;
+				var searchOverlap = matchCount / searchWords.length;
+				
+				if (sjrWords.length >= 5 && 
+				    sjrOverlap >= 0.85 && 
+				    searchOverlap >= 0.80) {
+					var sjrData = sjrRankings[title];
+					return sjrData.quartile + " " + sjrData.sjr;
+				}
+			}
+							// If not found in journals, try CORE conference rankings (if enabled)
 				if (Zotero.Prefs.get('extensions.sjr-core-rankings.enableCORE', true)) {
 					var coreRank = this.matchCoreConference(normalizedTitle);
 					if (coreRank) {
@@ -391,31 +399,39 @@ ZoteroRankings = {
 				}
 			}
 			
-			// Try word overlap matching for SJR conference proceedings
-			var cleanedSearch = this.normalizeString(this.cleanConferenceTitle(normalizedTitle));
-			var searchWords = cleanedSearch.split(' ').filter(function(w) { return w.length > 3; });
+		// Try word overlap matching for SJR conference proceedings
+		// This is aggressive, so use high threshold to avoid false positives
+		var cleanedSearch = this.normalizeString(this.cleanConferenceTitle(normalizedTitle));
+		var searchWords = cleanedSearch.split(' ').filter(function(w) { return w.length > 3; });
+		
+		for (var title in sjrRankings) {
+			var cleanedSjr = this.normalizeString(title);
+			var sjrWords = cleanedSjr.split(' ').filter(function(w) { return w.length > 3; });
 			
-			for (var title in sjrRankings) {
-				var cleanedSjr = this.normalizeString(title);
-				var sjrWords = cleanedSjr.split(' ').filter(function(w) { return w.length > 3; });
-				
-				// Count how many significant words overlap
-				var matchCount = 0;
-				for (var k = 0; k < sjrWords.length; k++) {
-					if (searchWords.indexOf(sjrWords[k]) !== -1) {
-						matchCount++;
-					}
-				}
-				
-				// If most words overlap (70%+) and it looks like a conference, match it
-				if (sjrWords.length >= 4 && matchCount / sjrWords.length >= 0.7) {
-					var sjrData = sjrRankings[title];
-					displayValue = sjrData.quartile + " " + sjrData.sjr;
-					return displayValue;
+			// Count how many significant words overlap
+			var matchCount = 0;
+			for (var k = 0; k < sjrWords.length; k++) {
+				if (searchWords.indexOf(sjrWords[k]) !== -1) {
+					matchCount++;
 				}
 			}
 			
-			// If not found in journals, try CORE conference rankings (if enabled)
+			// Use stricter criteria to avoid false positives:
+			// 1. Require 85% overlap from SJR side
+			// 2. Require 80% overlap from search side (allows "Proceedings of...")
+			// 3. Require longer titles (5+ words instead of 4+)
+			var sjrOverlap = matchCount / sjrWords.length;
+			var searchOverlap = matchCount / searchWords.length;
+			
+			if (sjrWords.length >= 5 && 
+			    sjrOverlap >= 0.85 && 
+			    searchOverlap >= 0.80) {
+				var sjrData = sjrRankings[title];
+				displayValue = sjrData.quartile + " " + sjrData.sjr;
+				return displayValue;
+			}
+		}
+					// If not found in journals, try CORE conference rankings (if enabled)
 			if (Zotero.Prefs.get('extensions.sjr-core-rankings.enableCORE', true)) {
 				var coreRank = this.matchCoreConference(normalizedTitle);
 				if (coreRank) {

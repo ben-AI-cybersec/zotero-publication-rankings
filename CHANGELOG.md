@@ -11,12 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed global variable scope issue preventing plugin from loading
 - Fixed menu item not appearing in Tools menu (now uses correct `menu_ToolsPopup` ID)
 - Fixed `ZoteroPane is not defined` error when using "Check Rankings" menu item
+- **Fixed false positive matches** where unrelated journals were incorrectly matched (e.g., "World Journal of Science and Technology" matching "Journal of Materials Science and Technology")
 - Added window tracking to prevent duplicate UI elements
 
 ### Changed
 - Removed unnecessary sandbox/context approach for simpler script loading
 - Improved error handling and debug logging
 - Menu item now correctly passes window context to ranking checker
+- **Improved fuzzy matching algorithm** with stricter criteria:
+  - Increased threshold from 70% to 85% overlap (SJR side)
+  - Added 80% bidirectional overlap requirement (search side)
+  - Increased minimum title length from 4 to 5 significant words
+  - Reduces false positives while maintaining legitimate conference proceedings matches
 
 ## [1.1.1] - 2025-11-05
 Refactoring for initial release
