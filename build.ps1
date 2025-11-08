@@ -34,6 +34,9 @@ $filesToInclude = @(
     "logo.svg",
     "preferences.xhtml",
     "data.js",
+    "matching.js",
+    "overrides.js",
+    "ui-utils.js",
     "rankings.js"
 )
 

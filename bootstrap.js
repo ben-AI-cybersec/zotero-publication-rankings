@@ -56,6 +56,16 @@ async function startup({ id, version, rootURI }) {
 	Services.scriptloader.loadSubScript(rootURI + 'data.js');
 	log("data.js loaded successfully");
 	
+	// Load modular components
+	Services.scriptloader.loadSubScript(rootURI + 'matching.js');
+	log("matching.js loaded successfully");
+	
+	Services.scriptloader.loadSubScript(rootURI + 'overrides.js');
+	log("overrides.js loaded successfully");
+	
+	Services.scriptloader.loadSubScript(rootURI + 'ui-utils.js');
+	log("ui-utils.js loaded successfully");
+	
 	Services.scriptloader.loadSubScript(rootURI + 'rankings.js');
 	log("rankings.js loaded successfully");
 	

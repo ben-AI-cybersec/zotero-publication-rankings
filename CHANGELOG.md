@@ -7,14 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.1.2] - 2025-11-08
 
+### Added
+- **Debug matching mode** - detailed logging shows all matching strategies attempted
+- **Manual ranking override** - right-click context menu to manually set rankings for mismatches
+- **Column sorting** - rankings now sort correctly in item tree (best to worst)
+- Context menu: "Debug Match for Selected Items" shows detailed algorithm output
+- Context menu: "Set Manual Ranking..." allows correcting false positives
+- Context menu: "Clear Manual Ranking" reverts to automatic matching
+- Manual overrides persist and survive Zotero restarts
+
 ### Fixed
 - Fixed global variable scope issue preventing plugin from loading
 - Fixed menu item not appearing in Tools menu (now uses correct `menu_ToolsPopup` ID)
 - Fixed `ZoteroPane is not defined` error when using "Check Rankings" menu item
 - **Fixed false positive matches** where unrelated journals were incorrectly matched (e.g., "World Journal of Science and Technology" matching "Journal of Materials Science and Technology")
+- **Fixed CORE acronym matching bug** - acronyms now used as last resort only, with safety checks:
+  - Acronyms require 4+ characters to avoid ambiguous matches (CSR, AI, ML, IoT, etc.)
+  - Detects ambiguous acronyms (multiple conferences with same acronym) and refuses to match
+  - Strategy order: Exact → Substring → Word Overlap → Acronym (last)
 - Added window tracking to prevent duplicate UI elements
+- Column sorting now works correctly with zero-padded numeric prefixes
 
 ### Changed
+- **Code modularization** - refactored into separate modules for maintainability:
+  - `matching.js` - String normalization and ranking match algorithms (265 lines)
+  - `overrides.js` - Manual override management with persistent storage (102 lines)
+  - `ui-utils.js` - UI helpers for colors, sorting, formatting (147 lines)
+  - `rankings.js` - Main plugin coordination and Zotero integration (808 lines, down from 1013)
 - Removed unnecessary sandbox/context approach for simpler script loading
 - Improved error handling and debug logging
 - Menu item now correctly passes window context to ranking checker
@@ -23,6 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added 80% bidirectional overlap requirement (search side)
   - Increased minimum title length from 4 to 5 significant words
   - Reduces false positives while maintaining legitimate conference proceedings matches
+- Ranking cache automatically cleared when manual overrides change
 
 ## [1.1.1] - 2025-11-05
 Refactoring for initial release

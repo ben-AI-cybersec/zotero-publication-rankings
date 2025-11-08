@@ -10,6 +10,11 @@ A Zotero plugin that automatically displays journal and conference rankings in a
 - **Color-Coded Display**: Green (Q1/A*) → Blue (Q2/A) → Orange (Q3/B) → Red (Q4/C)
 - **Smart Matching**: 8 fuzzy matching strategies handle title variations and acronyms
 - **Automatic Updates**: Rankings appear when items are added or viewed
+- **Sortable Column**: Click column header to sort by ranking tier (A* → Q4)
+- **Context Menu Integration**: Right-click items for quick ranking operations
+- **Debug Matching**: Detailed logging to troubleshoot matching issues
+- **Manual Override**: Set custom rankings for incorrectly matched journals
+- **Persistent Storage**: Manual overrides and preferences survive Zotero restarts
 
 ## Installation
 
@@ -22,14 +27,46 @@ A Zotero plugin that automatically displays journal and conference rankings in a
 
 Rankings automatically appear in the Ranking column when you view items.
 
-### Manual Check (Coming soon)
+### Check Rankings
 
 To see statistics about ranking matches for selected items:
 1. Select one or more items in your library
-2. Go to Tools → "Check Rankings for Selected Items"
-3. A dialog will show how many were found/not found
+2. Right-click → "Check SJR & CORE Rankings" (or Tools → "Check SJR & CORE Rankings")
+3. A dialog shows how many rankings were found/not found
 
-Note: This only shows statistics; rankings are always visible in the column.
+### Debug Matching
+
+If rankings aren't appearing correctly:
+1. Select items to debug
+2. Right-click → "Debug Ranking Match"
+3. Open Help → Debug Output Logging → View Output
+4. Look for lines starting with `[MATCH DEBUG]` showing:
+   - Matching strategies attempted (exact, fuzzy, word overlap, CORE)
+   - Match percentages and which database was used
+   - Final ranking result or why no match was found
+
+### Manual Ranking Override
+
+For incorrectly matched journals or unmatched publications:
+1. Select items from the same publication
+2. Right-click → "Set Manual Ranking..."
+3. Enter ranking (e.g., "A*", "Q1", "B", "C", "Au A", "Nat B")
+4. The ranking column updates immediately
+
+To remove a manual override:
+1. Select items
+2. Right-click → "Clear Manual Ranking"
+3. Rankings revert to automatic matching
+
+**Note**: Manual overrides are stored persistently and survive Zotero restarts.
+
+### Sorting by Ranking
+
+Click the "Ranking" column header to sort items by ranking tier:
+- **Ascending**: Best (A*) → Worst (Unranked)
+- **Descending**: Worst (Unranked) → Best (A*)
+
+The sort order follows: A* > Q1/A > Q2/B > Q3/C > Q4 > National > Unranked
 
 ## Preferences
 
@@ -83,8 +120,12 @@ sjr-core-rankings-zotero-plugin/
 │   └── generate_data_js.py          # Combine into data.js
 ├── manifest.json                     # Plugin metadata
 ├── bootstrap.js                      # Plugin lifecycle hooks
-├── rankings.js                       # Main plugin logic
-├── data.js                           # Rankings data (2.2MB)
+├── prefs.js                          # Default preferences
+├── data.js                           # Rankings databases (32,934 lines)
+├── matching.js                       # String normalization & matching algorithms
+├── overrides.js                      # Manual override persistence
+├── ui-utils.js                       # UI formatting, colors, sorting
+├── rankings.js                       # Main plugin coordination
 ├── preferences.xhtml                 # Settings UI
 ├── logo.svg                          # Plugin icon
 ├── build.ps1                         # Build script (creates XPI)
@@ -93,6 +134,28 @@ sjr-core-rankings-zotero-plugin/
 ├── INSTALL.md                        # Installation guide
 └── LICENSE                           # GPLv3 license
 ```
+
+### Modular Architecture
+
+The plugin uses a modular architecture for better maintainability:
+
+- **`bootstrap.js`** (115 lines) - Plugin lifecycle management, loads all modules
+- **`data.js`** (32,934 lines) - Ranking databases: `sjrRankings` (30,818 journals), `coreRankings` (2,107 conferences)
+- **`matching.js`** (237 lines) - String normalization and matching algorithms
+  - 5-strategy CORE conference matching (exact → substring → word overlap → acronym)
+  - 3-strategy SJR journal matching with fuzzy logic
+  - Exported as `MatchingUtils` global object
+- **`overrides.js`** (100 lines) - Manual ranking override management
+  - Persistent storage in Zotero preferences
+  - Exported as `ManualOverrides` global object
+- **`ui-utils.js`** (133 lines) - UI formatting and display helpers
+  - Color coding (green for A*/Q1, blue for A/Q2, orange for B/Q3, red for C/Q4)
+  - Sort value calculation with inversion for proper ordering
+  - Exported as `UIUtils` global object
+- **`rankings.js`** (808 lines) - Main plugin coordination
+  - Zotero integration (custom column, context menus, notifier)
+  - Item tree display and caching
+  - Exported as `ZoteroRankings` global object (attached to `Zotero.SJRCoreRankings`)
 
 ## Data Sources
 

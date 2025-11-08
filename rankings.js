@@ -1,6 +1,6 @@
 /*
  * SJR & CORE Rankings Plugin for Zotero 7
- * Main plugin logic and ranking matching algorithms
+ * Main plugin coordination and Zotero integration
  * 
  * Copyright (C) 2025 Ben Stephens
  * 
@@ -18,7 +18,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global ZoteroPane, sjrRankings, coreRankings */
+/* global ZoteroPane, sjrRankings, coreRankings, MatchingUtils, ManualOverrides, UIUtils */
 
 // Declare as global variable (no 'var' inside if-block to avoid local scope)
 if (typeof ZoteroRankings === 'undefined') {
@@ -32,6 +32,7 @@ ZoteroRankings = {
 	notifierID: null,
 	columnDataKey: null,
 	windows: new Set(),  // Track windows we've added UI to
+	rankingCache: new Map(),  // Cache rankings to avoid recalculation
 	
 	init: async function({ id, version, rootURI }) {
 			Zotero.debug("========================================");
@@ -42,6 +43,9 @@ ZoteroRankings = {
 		this.version = version;
 		this.rootURI = rootURI;
 		
+		// Initialize manual overrides from ManualOverrides module
+		await ManualOverrides.load();
+		
 		// Register custom column in item tree
 		Zotero.debug("SJR & CORE Rankings: Attempting to register column");
 		try {
@@ -50,17 +54,44 @@ ZoteroRankings = {
 				label: 'Ranking',  // Will be replaced by Fluent when available
 				pluginID: 'sjr-core-rankings@zotero.org',
 				dataProvider: (item, dataKey) => {
-					return this.getRankingSync(item);
+					// Use cache if available
+					const itemID = item.id;
+					let ranking;
+					
+					if (!this.rankingCache.has(itemID)) {
+						ranking = this.getRankingSync(item);
+						this.rankingCache.set(itemID, ranking);
+					} else {
+						ranking = this.rankingCache.get(itemID);
+					}
+					
+					// Zotero sorts alphabetically by dataProvider return value
+					// Prepend numeric sort value to force correct ordering
+					// Since higher values = better ranking, but alphabetical sort is ascending,
+					// we invert the value (9999 - sortValue) so best items sort first
+					// Format: "invertedSortValue|ranking" where invertedSortValue is 4-digit zero-padded
+					const sortValue = UIUtils.getRankingSortValue(ranking);
+					const invertedValue = 9999 - sortValue; // Invert: 1000 becomes 8999, 50 becomes 9949
+					const paddedValue = String(invertedValue).padStart(4, '0');
+					
+					return `${paddedValue}|${ranking}`;
 				},
 				renderCell: (index, data, column, isFirstColumn, doc) => {
 					// Create cell element
 					const cell = doc.createElement('span');
 					cell.className = `cell ${column.className}`;
-					cell.textContent = data;
+					
+					// Strip the sort prefix (format is "sortValue|ranking")
+					let displayText = data;
+					if (data && data.includes('|')) {
+						displayText = data.split('|')[1];
+					}
+					
+					cell.textContent = displayText;
 					
 					// Apply color coding based on ranking
-					if (data) {
-						const color = this.getRankingColor(data);
+					if (displayText) {
+						const color = UIUtils.getRankingColor(displayText);
 						if (color) {
 							cell.style.color = color;
 							cell.style.fontWeight = 'bold';
@@ -68,6 +99,23 @@ ZoteroRankings = {
 					}
 					
 					return cell;
+				},
+				// sortingKey: Intended to return numeric values for efficient sorting,
+				// but Zotero appears to sort alphabetically by dataProvider value instead.
+				// We work around this by prepending zero-padded sort values to dataProvider output.
+				// Keeping this as documentation of the intended API usage.
+				sortingKey: (item) => {
+					const itemID = item.id;
+					let ranking;
+					
+					if (this.rankingCache.has(itemID)) {
+						ranking = this.rankingCache.get(itemID);
+					} else {
+						ranking = this.getRankingSync(item);
+						this.rankingCache.set(itemID, ranking);
+					}
+					
+					return UIUtils.getRankingSortValue(ranking);
 				},
 				flex: 1,
 				zoteroPersist: ['width', 'hidden', 'sortDirection']
@@ -101,11 +149,16 @@ ZoteroRankings = {
 			return;
 		}
 		
+		// Clear cache for modified items
+		for (let id of ids) {
+			this.rankingCache.delete(id);
+		}
+		
 		// The custom column's dataProvider will automatically be called when the item tree refreshes
 		// Just trigger a refresh for the affected items
 		try {
 			Zotero.Notifier.trigger('refresh', 'itemtree', []);
-			Zotero.debug("SJR & CORE Rankings: Triggered item tree refresh for " + ids.length + " items");
+			Zotero.debug("SJR & CORE Rankings: Triggered item tree refresh and cache clear for " + ids.length + " items");
 		}
 		catch (e) {
 			Zotero.logError("SJR & CORE Rankings: Error refreshing item tree: " + e);
@@ -142,7 +195,7 @@ ZoteroRankings = {
 		// Mark this window as processed
 		this.windows.add(window);
 		
-		// Create menu item
+		// Create menu item for Tools menu
 		var menuItem = doc.createXULElement('menuitem');
 		menuItem.id = 'zotero-rankings-update';
 		menuItem.setAttribute('label', 'Check SJR & CORE Rankings');
@@ -150,35 +203,61 @@ ZoteroRankings = {
 			this.updateSelectedItems(window);  // Pass window to get ZoteroPane
 		});
 		
-		// Try multiple possible menu locations
-		// First try: Tools menu popup (Zotero 7 standard location)
+		// Add to Tools menu
 		var toolsMenu = doc.getElementById('menu_ToolsPopup');
 		if (toolsMenu) {
 			// Add separator before our item for visual grouping
 			var separator = doc.createXULElement('menuseparator');
 			separator.id = 'zotero-rankings-separator';
 			toolsMenu.appendChild(separator);
+			toolsMenu.appendChild(menuItem);
+			Zotero.debug("SJR & CORE Rankings: Menu item added to Tools menu");
+		}
+		
+		// Also add to item context menu (right-click on items)
+		var contextMenu = doc.getElementById('zotero-itemmenu');
+		if (contextMenu) {
+			var contextSeparator = doc.createXULElement('menuseparator');
+			contextSeparator.id = 'zotero-rankings-context-separator';
 			
-			toolsMenu.appendChild(menuItem);
-			Zotero.debug("SJR & CORE Rankings: Menu item added to Tools menu (menu_ToolsPopup)");
-			return;
+			var contextMenuItem = doc.createXULElement('menuitem');
+			contextMenuItem.id = 'zotero-rankings-context-update';
+			contextMenuItem.setAttribute('label', 'Check SJR & CORE Rankings');
+			contextMenuItem.addEventListener('command', () => {
+				this.updateSelectedItems(window);
+			});
+			
+			// Debug matching menu item
+			var debugMenuItem = doc.createXULElement('menuitem');
+			debugMenuItem.id = 'zotero-rankings-context-debug';
+			debugMenuItem.setAttribute('label', 'Debug Ranking Match');
+			debugMenuItem.addEventListener('command', () => {
+				this.debugSelectedItems(window);
+			});
+			
+			// Set manual ranking menu item
+			var manualMenuItem = doc.createXULElement('menuitem');
+			manualMenuItem.id = 'zotero-rankings-context-manual';
+			manualMenuItem.setAttribute('label', 'Set Manual Ranking...');
+			manualMenuItem.addEventListener('command', () => {
+				this.setManualRankingDialog(window);
+			});
+			
+			// Clear manual ranking menu item
+			var clearMenuItem = doc.createXULElement('menuitem');
+			clearMenuItem.id = 'zotero-rankings-context-clear';
+			clearMenuItem.setAttribute('label', 'Clear Manual Ranking');
+			clearMenuItem.addEventListener('command', () => {
+				this.clearManualRankingForSelected(window);
+			});
+			
+			contextMenu.appendChild(contextSeparator);
+			contextMenu.appendChild(contextMenuItem);
+			contextMenu.appendChild(debugMenuItem);
+			contextMenu.appendChild(manualMenuItem);
+			contextMenu.appendChild(clearMenuItem);
+			Zotero.debug("SJR & CORE Rankings: Context menu items added");
 		}
-		
-		// Fallback: Try toolbar actions popup
-		toolsMenu = doc.getElementById('zotero-tb-actions-popup');
-		if (toolsMenu) {
-			toolsMenu.appendChild(menuItem);
-			Zotero.debug("SJR & CORE Rankings: Menu item added to toolbar actions popup");
-			return;
-		}
-		
-		// If we get here, no menu was found
-		Zotero.debug("SJR & CORE Rankings: WARNING - Could not find any suitable menu to attach to");
-		Zotero.debug("SJR & CORE Rankings: Available menu IDs: " + 
-			Array.from(doc.querySelectorAll('[id*="menu"], [id*="popup"]'))
-				.map(el => el.id)
-				.filter(id => id)
-				.join(', '));
 	},
 	
 	removeFromAllWindows: function() {
@@ -207,73 +286,48 @@ ZoteroRankings = {
 		
 		var doc = window.document;
 		
-		// Remove menu item
+		// Remove Tools menu items
 		var menuItem = doc.getElementById('zotero-rankings-update');
 		if (menuItem) {
 			menuItem.remove();
 		}
 		
-		// Remove separator
 		var separator = doc.getElementById('zotero-rankings-separator');
 		if (separator) {
 			separator.remove();
 		}
+		
+		// Remove context menu items
+		var contextMenuItem = doc.getElementById('zotero-rankings-context-update');
+		if (contextMenuItem) {
+			contextMenuItem.remove();
+		}
+		
+		var debugMenuItem = doc.getElementById('zotero-rankings-context-debug');
+		if (debugMenuItem) {
+			debugMenuItem.remove();
+		}
+		
+		var manualMenuItem = doc.getElementById('zotero-rankings-context-manual');
+		if (manualMenuItem) {
+			manualMenuItem.remove();
+		}
+		
+		var clearMenuItem = doc.getElementById('zotero-rankings-context-clear');
+		if (clearMenuItem) {
+			clearMenuItem.remove();
+		}
+		
+		var contextSeparator = doc.getElementById('zotero-rankings-context-separator');
+		if (contextSeparator) {
+			contextSeparator.remove();
+		}
 	},
 	
-	// Get color for ranking display
-	getRankingColor: function(ranking) {
-		if (!ranking) return null;
-		
-		// SJR Quartiles (Green to Red gradient)
-		if (ranking.startsWith('Q1')) {
-			return '#2E7D32'; // Dark green (best)
-		}
-		if (ranking.startsWith('Q2')) {
-			return '#0288D1'; // Blue
-		}
-		if (ranking.startsWith('Q3')) {
-			return '#F57C00'; // Orange
-		}
-		if (ranking.startsWith('Q4')) {
-			return '#D32F2F'; // Red (lowest)
-		}
-		
-		// CORE Conference Rankings (same gradient)
-		if (ranking === 'A*' || ranking.startsWith('A* ')) {
-			return '#2E7D32'; // Dark green (best)
-		}
-		if (ranking === 'A' || ranking.startsWith('A ') || ranking.startsWith('A[')) {
-			return '#0288D1'; // Blue
-		}
-		if (ranking === 'B' || ranking.startsWith('B ') || ranking.startsWith('B[')) {
-			return '#F57C00'; // Orange
-		}
-		if (ranking === 'C' || ranking.startsWith('C ') || ranking.startsWith('C[')) {
-			return '#D32F2F'; // Red
-		}
-		
-		// Australasian Rankings (same gradient)
-		if (ranking.startsWith('Au A')) {
-			return '#0288D1'; // Blue
-		}
-		if (ranking.startsWith('Au B')) {
-			return '#F57C00'; // Orange
-		}
-		if (ranking.startsWith('Au C')) {
-			return '#D32F2F'; // Red
-		}
-		
-		// National Rankings (use purple to distinguish from main tiers)
-		if (ranking.startsWith('Nat ')) {
-			return '#7B1FA2'; // Purple
-		}
-		
-		// Default for other rankings (TBR, Unranked, etc.)
-		return '#757575'; // Gray
-	},
+	
 	
 	// Synchronous version of getRankingForItem for use in dataProvider
-	getRankingSync: function(item) {
+	getRankingSync: function(item, enableDebug = false) {
 		try {
 			if (!item || !item.isRegularItem()) {
 				return '';
@@ -294,32 +348,59 @@ ZoteroRankings = {
 			
 			var normalizedTitle = publicationTitle.trim();
 			
+			// Debug logging helper
+			const debugLog = (message) => {
+				if (enableDebug) {
+					Zotero.debug(`[MATCH DEBUG] ${message}`);
+				}
+			};
+			
+			debugLog(`=== Matching: "${publicationTitle}" ===`);
+			
+			// Check manual overrides first
+			const manualOverride = ManualOverrides.get(publicationTitle);
+			if (manualOverride) {
+				debugLog(`✓ MANUAL OVERRIDE: "${manualOverride}"`);
+				return manualOverride;
+			}
+			debugLog(`No manual override found`);
+			
 			// First, try to match against SJR journal rankings (exact match)
 			var normalizedSearch = normalizedTitle.toLowerCase();
+			debugLog(`Trying SJR exact match (lowercase): "${normalizedSearch}"`);
 				for (var title in sjrRankings) {
 					if (title.toLowerCase() === normalizedSearch) {
 						var sjrData = sjrRankings[title];
-						return sjrData.quartile + " " + sjrData.sjr;
+						const result = sjrData.quartile + " " + sjrData.sjr;
+						debugLog(`✓ SJR EXACT MATCH: "${title}" -> ${result}`);
+						return result;
 					}
 				}
+				debugLog(`No SJR exact match found`);
 				
 				// Try fuzzy match for SJR (some entries have ", ACRONYM" format)
-				var cleanedSearch = this.normalizeString(this.cleanConferenceTitle(normalizedTitle));
+				var cleanedSearch = MatchingUtils.normalizeString(MatchingUtils.cleanConferenceTitle(normalizedTitle));
+				debugLog(`Trying SJR fuzzy match: "${cleanedSearch}"`);
 				for (var title in sjrRankings) {
-					var cleanedSjr = this.normalizeString(title.split(',')[0].trim()); // Remove ", ACRONYM" part
+					var cleanedSjr = MatchingUtils.normalizeString(title.split(',')[0].trim()); // Remove ", ACRONYM" part
 					if (cleanedSjr === cleanedSearch && cleanedSjr.length > 10) {
 						var sjrData = sjrRankings[title];
-						return sjrData.quartile + " " + sjrData.sjr;
+						const result = sjrData.quartile + " " + sjrData.sjr;
+						debugLog(`✓ SJR FUZZY MATCH: "${title}" -> ${result}`);
+						return result;
 					}
 				}
+				debugLog(`No SJR fuzzy match found`);
 				
 			// Try word overlap matching for SJR conference proceedings
 			// This is aggressive, so use high threshold to avoid false positives
-			var cleanedSearch = this.normalizeString(this.cleanConferenceTitle(normalizedTitle));
+			var cleanedSearch = MatchingUtils.normalizeString(MatchingUtils.cleanConferenceTitle(normalizedTitle));
 			var searchWords = cleanedSearch.split(' ').filter(function(w) { return w.length > 3; });
 			
+			debugLog(`Trying SJR word overlap: cleaned="${cleanedSearch}", words=[${searchWords.join(', ')}]`);
+			
 			for (var title in sjrRankings) {
-				var cleanedSjr = this.normalizeString(title);
+				var cleanedSjr = MatchingUtils.normalizeString(title);
 				var sjrWords = cleanedSjr.split(' ').filter(function(w) { return w.length > 3; });
 				
 				// Count how many significant words overlap
@@ -341,17 +422,28 @@ ZoteroRankings = {
 				    sjrOverlap >= 0.85 && 
 				    searchOverlap >= 0.80) {
 					var sjrData = sjrRankings[title];
-					return sjrData.quartile + " " + sjrData.sjr;
+					const result = sjrData.quartile + " " + sjrData.sjr;
+					debugLog(`✓ SJR WORD OVERLAP MATCH: "${title}"`);
+					debugLog(`  Matched ${matchCount}/${sjrWords.length} SJR words (${(sjrOverlap*100).toFixed(0)}%), ${matchCount}/${searchWords.length} search words (${(searchOverlap*100).toFixed(0)}%)`);
+					debugLog(`  Result: ${result}`);
+					return result;
 				}
 			}
+			debugLog(`No SJR word overlap match found (checked ${Object.keys(sjrRankings).length} entries)`);
 							// If not found in journals, try CORE conference rankings (if enabled)
 				if (Zotero.Prefs.get('extensions.sjr-core-rankings.enableCORE', true)) {
-					var coreRank = this.matchCoreConference(normalizedTitle);
+					debugLog(`Trying CORE rankings (enabled in preferences)`);
+					var coreRank = MatchingUtils.matchCoreConference(normalizedTitle, enableDebug);
 					if (coreRank) {
+						debugLog(`✓ CORE MATCH: ${coreRank}`);
 						return coreRank;
 					}
+					debugLog(`No CORE match found`);
+				} else {
+					debugLog(`CORE rankings disabled in preferences`);
 				}
 				
+				debugLog(`✗ NO MATCH FOUND for "${publicationTitle}"`);
 				return '';
 			}
 			catch (e) {
@@ -389,9 +481,9 @@ ZoteroRankings = {
 			}
 			
 			// Try fuzzy match for SJR (some entries have ", ACRONYM" format)
-			var cleanedSearch = this.normalizeString(this.cleanConferenceTitle(normalizedTitle));
+			var cleanedSearch = MatchingUtils.normalizeString(MatchingUtils.cleanConferenceTitle(normalizedTitle));
 			for (var title in sjrRankings) {
-				var cleanedSjr = this.normalizeString(title.split(',')[0].trim()); // Remove ", ACRONYM" part
+				var cleanedSjr = MatchingUtils.normalizeString(title.split(',')[0].trim()); // Remove ", ACRONYM" part
 				if (cleanedSjr === cleanedSearch && cleanedSjr.length > 10) {
 					var sjrData = sjrRankings[title];
 					displayValue = sjrData.quartile + " " + sjrData.sjr;
@@ -401,11 +493,11 @@ ZoteroRankings = {
 			
 		// Try word overlap matching for SJR conference proceedings
 		// This is aggressive, so use high threshold to avoid false positives
-		var cleanedSearch = this.normalizeString(this.cleanConferenceTitle(normalizedTitle));
+		var cleanedSearch = MatchingUtils.normalizeString(MatchingUtils.cleanConferenceTitle(normalizedTitle));
 		var searchWords = cleanedSearch.split(' ').filter(function(w) { return w.length > 3; });
 		
 		for (var title in sjrRankings) {
-			var cleanedSjr = this.normalizeString(title);
+			var cleanedSjr = MatchingUtils.normalizeString(title);
 			var sjrWords = cleanedSjr.split(' ').filter(function(w) { return w.length > 3; });
 			
 			// Count how many significant words overlap
@@ -433,7 +525,7 @@ ZoteroRankings = {
 		}
 					// If not found in journals, try CORE conference rankings (if enabled)
 			if (Zotero.Prefs.get('extensions.sjr-core-rankings.enableCORE', true)) {
-				var coreRank = this.matchCoreConference(normalizedTitle);
+				var coreRank = MatchingUtils.matchCoreConference(normalizedTitle);
 				if (coreRank) {
 					return coreRank;
 				}
@@ -442,15 +534,6 @@ ZoteroRankings = {
 			return null;
 		},
 		
-		// Helper function to normalize strings for comparison
-		normalizeString: function(str) {
-			return str.toLowerCase()
-				.replace(/&/g, 'and')  // Replace & with 'and'
-				.replace(/\btelecomm?unications?\b/g, 'communications')  // Normalize telecom variants
-				.replace(/[^\w\s]/g, ' ')
-				.replace(/\s+/g, ' ')
-				.trim();
-		},
 		
 		// Extract acronym from conference title
 		extractAcronym: function(title) {
@@ -478,69 +561,7 @@ ZoteroRankings = {
 				.trim();
 			return cleaned;
 		},
-		
-		// Match conference against CORE rankings
-		matchCoreConference: function(zoteroTitle) {
-			var normalizedZotero = this.normalizeString(this.cleanConferenceTitle(zoteroTitle));
-			var zoteroAcronym = this.extractAcronym(zoteroTitle);
-			
-			// Strategy 1: Try acronym matching first
-			if (zoteroAcronym) {
-				for (var title in coreRankings) {
-					if (coreRankings[title].acronym === zoteroAcronym) {
-						return coreRankings[title].rank;
-					}
-				}
-			}
-			
-			// Strategy 2: Try normalized exact matching
-			for (var title in coreRankings) {
-				var normalizedCore = this.normalizeString(title);
-				if (normalizedZotero === normalizedCore) {
-					return coreRankings[title].rank;
-				}
-			}
-			
-			// Strategy 3: Check if CORE title is contained in Zotero title
-			for (var title in coreRankings) {
-				var normalizedCore = this.normalizeString(title);
-				if (normalizedZotero.indexOf(normalizedCore) !== -1 && normalizedCore.length > 20) {
-					return coreRankings[title].rank;
-				}
-			}
-			
-			// Strategy 4: Check if Zotero title contains CORE title (reverse substring)
-			for (var title in coreRankings) {
-				var normalizedCore = this.normalizeString(title);
-				if (normalizedCore.indexOf(normalizedZotero) !== -1 && normalizedZotero.length > 20) {
-					return coreRankings[title].rank;
-				}
-			}
-			
-			// Strategy 5: Word overlap matching (for titles with extra words like "SIGSAC")
-			var zoteroWords = normalizedZotero.split(' ').filter(function(w) { return w.length > 3; });
-			for (var title in coreRankings) {
-				var normalizedCore = this.normalizeString(title);
-				var coreWords = normalizedCore.split(' ').filter(function(w) { return w.length > 3; });
-				
-				// Count how many significant words overlap
-				var matchCount = 0;
-				for (var i = 0; i < coreWords.length; i++) {
-					if (zoteroWords.indexOf(coreWords[i]) !== -1) {
-						matchCount++;
-					}
-				}
-				
-				// If most core words are present (80%+), it's likely a match
-				if (coreWords.length >= 4 && matchCount / coreWords.length >= 0.8) {
-					return coreRankings[title].rank;
-				}
-			}
-			
-			return null;
-		},
-		
-		// Main function to update selected items (now just shows statistics without modifying items)
+				// Main function to update selected items (now just shows statistics without modifying items)
 		updateSelectedItems: async function(window) {
 			// Get ZoteroPane from the window context
 			var ZoteroPane = window.ZoteroPane;
@@ -610,6 +631,184 @@ ZoteroRankings = {
 				}
 			}
 			
-			await Zotero.alert(window, "Rankings Check Complete", message);
+		await Zotero.alert(window, "Rankings Check Complete", message);
+	},
+	
+	// Debug matching for selected items - shows detailed matching algorithm output
+	debugSelectedItems: async function(window) {
+		var ZoteroPane = window.ZoteroPane;
+		
+		if (!ZoteroPane) {
+			Zotero.debug("SJR & CORE Rankings: ZoteroPane not available");
+			return;
 		}
+		
+		var items = ZoteroPane.getSelectedItems();
+		
+		if (items.length === 0) {
+			await Zotero.alert(window, "No items selected", "Please select one or more items to debug ranking matches.");
+			return;
+		}
+		
+		await Zotero.alert(
+			window,
+			"Debug Matching",
+			`Debug matching will be logged for ${items.length} item${items.length !== 1 ? 's' : ''}.\n\n` +
+			`Open Help → Debug Output Logging → View Output to see detailed matching information.\n\n` +
+			`Look for lines starting with [MATCH DEBUG].`
+		);
+		
+		// Process each item with debug logging enabled
+		for (var i = 0; i < items.length; i++) {
+			var item = items[i];
+			
+			if (!item.isRegularItem()) {
+				continue;
+			}
+			
+			// Call with debug enabled - this will log detailed matching info
+			this.getRankingSync(item, true);
+		}
+		
+		Zotero.debug("SJR & CORE Rankings: Debug matching complete");
+	},
+	
+	// Set manual ranking for selected items
+	setManualRankingDialog: async function(window) {
+		var ZoteroPane = window.ZoteroPane;
+		
+		if (!ZoteroPane) {
+			return;
+		}
+		
+		var items = ZoteroPane.getSelectedItems();
+		
+		if (items.length === 0) {
+			await Zotero.alert(window, "No items selected", "Please select one or more items to set manual ranking.");
+			return;
+		}
+		
+		// Get publication titles (ensure they're all the same for batch operations)
+		var publicationTitles = new Set();
+		for (var item of items) {
+			if (!item.isRegularItem()) continue;
+			
+			var pubTitle = item.getField('publicationTitle') ||
+						   item.getField('proceedingsTitle') ||
+						   item.getField('conferenceName');
+			if (pubTitle) {
+				publicationTitles.add(pubTitle.trim());
+			}
+		}
+		
+		if (publicationTitles.size === 0) {
+			await Zotero.alert(window, "No publication titles", "Selected items don't have publication titles.");
+			return;
+		}
+		
+		if (publicationTitles.size > 1) {
+			await Zotero.alert(
+				window,
+				"Multiple publications",
+				`Selected items have ${publicationTitles.size} different publication titles.\n\nPlease select items from the same publication to set a manual ranking.`
+			);
+			return;
+		}
+		
+		var publicationTitle = Array.from(publicationTitles)[0];
+		
+		// Check if there's already a manual override
+		var existingOverride = ManualOverrides.get(publicationTitle);
+		var defaultValue = existingOverride || '';
+		
+		// Prompt for ranking
+		var promptService = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
+									.getService(Components.interfaces.nsIPromptService);
+		
+		var input = { value: defaultValue };
+		var result = promptService.prompt(
+			window,
+			"Set Manual Ranking",
+			`Set ranking for:\n"${publicationTitle}"\n\nExamples: A*, A, B, C, Q1, Q2, Q3, Q4, Au A, Nat A\n\nRanking:`,
+			input,
+			null,
+			{}
+		);
+		
+		if (result && input.value) {
+			var ranking = input.value.trim();
+			await ManualOverrides.set(publicationTitle, ranking);
+			
+			// Clear cache for affected items and refresh
+			for (var item of items) {
+				this.rankingCache.delete(item.id);
+			}
+			
+			Zotero.Notifier.trigger('refresh', 'itemtree', []);
+			
+			await Zotero.alert(
+				window,
+				"Manual Ranking Set",
+				`Set ranking for "${publicationTitle}":\n${ranking}\n\nThe ranking column will update automatically.`
+			);
+		}
+	},
+	
+	// Clear manual ranking for selected items
+	clearManualRankingForSelected: async function(window) {
+		var ZoteroPane = window.ZoteroPane;
+		
+		if (!ZoteroPane) {
+			return;
+		}
+		
+		var items = ZoteroPane.getSelectedItems();
+		
+		if (items.length === 0) {
+			await Zotero.alert(window, "No items selected", "Please select one or more items to clear manual ranking.");
+			return;
+		}
+		
+		var cleared = 0;
+		var publicationTitles = new Set();
+		
+		for (var item of items) {
+			if (!item.isRegularItem()) continue;
+			
+			var pubTitle = item.getField('publicationTitle') ||
+						   item.getField('proceedingsTitle') ||
+						   item.getField('conferenceName');
+			if (pubTitle) {
+				publicationTitles.add(pubTitle.trim());
+			}
+		}
+		
+		for (var title of publicationTitles) {
+			if (ManualOverrides.get(title)) {
+				await ManualOverrides.remove(title);
+				cleared++;
+			}
+		}
+		
+		if (cleared > 0) {
+			// Clear cache and refresh
+			for (var item of items) {
+				this.rankingCache.delete(item.id);
+			}
+			
+			Zotero.Notifier.trigger('refresh', 'itemtree', []);
+			
+			await Zotero.alert(
+				window,
+				"Manual Rankings Cleared",
+				`Cleared ${cleared} manual ranking${cleared !== 1 ? 's' : ''}.\n\nRankings will revert to automatic matching.`
+			);
+		} else {
+			await Zotero.alert(
+				window,
+				"No Manual Rankings",
+				"None of the selected items have manual ranking overrides."
+			);
+		}
+	}
 };
