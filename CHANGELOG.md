@@ -12,14 +12,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Checkbox to enable/disable debug mode (default: disabled)
   - Controls visibility of "Debug Ranking Match" context menu item
   - Dynamic updates without restart - menu item appears/disappears immediately when toggled
-  - Keeps UI clean for regular users while providing debugging tools for power users
   - Uses preference observer for real-time menu updates across all windows
 
 ### Changed
 -
 
 ### Fixed
--
+- **Column resizing** - Fixed issue where Ranking column had excessive minimum width
+  - Shortened dataKey from 'sjr-core-ranking' to 'ranking' (Zotero uses dataKey length for minimum width)
+  - Removed explicit width constraints that interfered with natural resizing behavior
+  - Added 'ordinal' to zoteroPersist array for proper column position persistence
+  - Column now resizes smoothly and naturally like built-in Zotero columns
 
 
 ## [1.1.3] - 2025-11-09

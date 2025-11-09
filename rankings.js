@@ -51,8 +51,8 @@ ZoteroRankings = {
 		Zotero.debug("SJR & CORE Rankings: Attempting to register column");
 		try {
 			this.columnDataKey = await Zotero.ItemTreeManager.registerColumn({
-				dataKey: 'sjr-core-ranking',  // More unique dataKey
-				label: 'Ranking',  // Will be replaced by Fluent when available
+				dataKey: 'ranking',
+				label: 'Ranking',
 				pluginID: 'sjr-core-rankings@zotero.org',
 				dataProvider: (item, dataKey) => {
 					// Use cache if available
@@ -116,13 +116,10 @@ ZoteroRankings = {
 						this.rankingCache.set(itemID, ranking);
 					}
 					
-					return UIUtils.getRankingSortValue(ranking);
-				},
-				flex: 1,
-				zoteroPersist: ['width', 'hidden', 'sortDirection']
-			});
-			
-			Zotero.debug("SJR & CORE Rankings: Column registered with dataKey: " + this.columnDataKey);
+				return UIUtils.getRankingSortValue(ranking);
+			},
+			zoteroPersist: ['width', 'ordinal', 'hidden', 'sortDirection']
+		});			Zotero.debug("SJR & CORE Rankings: Column registered with dataKey: " + this.columnDataKey);
 		}
 		catch (e) {
 			Zotero.logError("SJR & CORE Rankings: Failed to register column: " + e);
