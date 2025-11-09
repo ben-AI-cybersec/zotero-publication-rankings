@@ -27,18 +27,48 @@ var { Services } = ChromeUtils.import("resource://gre/modules/Services.jsm");
 
 /**
  * Load all plugin modules in dependency order
+ * Modules are organized in src/ directories but loaded from root of XPI
  * 
  * @param {string} rootURI - Root URI of the extension
  */
 function loadModules(rootURI) {
 	const modules = [
-		'data.js',           // Rankings data (no dependencies)
-		'prefs-utils.js',    // Preference utilities (used by other modules)
-		'matching.js',       // Matching algorithms
-		'overrides.js',      // Manual overrides
-		'ui-utils.js',       // UI utilities
-		'rankings.js',       // Main plugin logic
-		'hooks.js'           // Lifecycle hooks (loads last)
+		// Data files
+		'data.js',                // Rankings data (from src/data/)
+		
+		// Core utilities
+		'prefs-utils.js',         // Preference utilities (from src/core/)
+		
+		// Engine components
+		'matching.js',            // Matching algorithms (from src/engine/)
+		
+		// Actions
+		'overrides.js',           // Manual overrides (from src/actions/)
+		
+		// UI utilities
+		'ui-utils.js',            // UI utilities (from src/ui/)
+		
+		// Database system
+		'database-registry.js',   // Database plugin system (from src/databases/)
+		'database-sjr.js',        // SJR database plugin (from src/databases/)
+		'database-core.js',       // CORE database plugin (from src/databases/)
+		
+		// Engine
+		'ranking-engine.js',      // Core ranking logic (from src/engine/)
+		
+		// UI components
+		'column-manager.js',      // Column registration (from src/ui/)
+		'menu-manager.js',        // Menu management (from src/ui/)
+		'window-manager.js',      // Window tracking (from src/ui/)
+		
+		// Actions
+		'ranking-actions.js',     // User actions (from src/actions/)
+		
+		// Core coordinator
+		'rankings.js',            // Main coordinator (from src/core/)
+		
+		// Lifecycle
+		'hooks.js'                // Lifecycle hooks (from src/core/)
 	];
 	
 	for (const module of modules) {
@@ -49,12 +79,14 @@ function loadModules(rootURI) {
 
 /**
  * Bootstrap install hook - called when extension is installed or updated
+ * Note: Modules are NOT loaded yet at this point, so we can't delegate to Hooks
  * 
  * @param {Object} data - Installation data
  * @param {number} reason - Installation reason constant
  */
 function install(data, reason) {
-	Hooks.onInstall(data, reason);
+	// Nothing to do on install - modules aren't loaded yet
+	// All initialization happens in startup()
 }
 
 /**
@@ -105,10 +137,12 @@ function shutdown({ id, version, rootURI }, reason) {
 
 /**
  * Bootstrap uninstall hook - called when extension is uninstalled
+ * Note: Modules may not be loaded at this point
  * 
  * @param {Object} data - Uninstallation data
  * @param {number} reason - Uninstallation reason constant
  */
 function uninstall(data, reason) {
-	Hooks.onUninstall(data, reason);
+	// Nothing to do on uninstall - Zotero handles cleanup
+	// Preferences are preserved unless user explicitly clears them
 }

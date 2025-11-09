@@ -104,25 +104,5 @@ var Hooks = {
 	onMainWindowUnload({ window }) {
 		Zotero.debug("SJR & CORE Rankings: Main window unloading");
 		Zotero.SJRCoreRankings?.removeFromWindow(window);
-	},
-	
-	/**
-	 * Plugin install - called when extension is first installed or updated
-	 * 
-	 * @param {Object} data - Install data
-	 * @param {number} reason - Install reason constant
-	 */
-	onInstall(data, reason) {
-		Zotero.debug("SJR & CORE Rankings: Plugin installed/updated");
-	},
-	
-	/**
-	 * Plugin uninstall - called when extension is uninstalled
-	 * 
-	 * @param {Object} data - Uninstall data
-	 * @param {number} reason - Uninstall reason constant
-	 */
-	onUninstall(data, reason) {
-		Zotero.debug("SJR & CORE Rankings: Plugin uninstalled");
 	}
 };

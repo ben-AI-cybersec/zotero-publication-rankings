@@ -7,7 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.4] - 2025-11-09
+
 ### Added
+- **Database Registry System** - Extensible plugin architecture for multiple ranking databases
+  - New `DatabaseRegistry` module provides uniform interface for all ranking sources
+  - Database plugins register with priority, preference key, and matcher function
+  - Adding new databases (JCR, Qualis, ERA) requires zero changes to core logic
+  - Generic preference handling automatically supports new database toggles
+- **Modular database plugins** - SJR and CORE extracted as independent plugins
+  - `database-sjr.js` - SJR matching strategies (exact, fuzzy, word overlap)
+  - `database-core.js` - CORE conference matching wrapper
+  - Both databases treated uniformly via registry pattern
+- **Organized directory structure** - Professional source code organization
+  - `src/core/` - Main coordinator, lifecycle, preferences (3 files)
+  - `src/data/` - Database rankings data (1 file)
+  - `src/databases/` - Database plugins (registry, sjr, core) ⭐
+  - `src/engine/` - Ranking engine and matching logic (2 files)
+  - `src/ui/` - UI components (column, menus, windows, utilities - 4 files)
+  - `src/actions/` - User actions and overrides (2 files)
+  - Clean root directory with only Zotero-required files
+- **Enhanced preferences UI** - New "Ranking Databases" section
+  - SJR shown as always enabled (primary database)
+  - CORE shown as toggleable option with clear description
+  - Future-proof messaging about additional databases
+  - Better hierarchy: Databases → Auto-update → Developer options
 - **Debug mode preference** - New "Developer Options" section in preferences
   - Checkbox to enable/disable debug mode (default: disabled)
   - Controls visibility of "Debug Ranking Match" context menu item
@@ -26,11 +50,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Comprehensive JSDoc documentation for all hook functions
 
 ### Changed
+- **Architecture improvements** - Massive refactoring for extensibility and maintainability
+  - `RankingEngine` simplified from 252 → 132 lines (120 lines removed)
+  - Removed hardcoded SJR/CORE logic, now uses DatabaseRegistry
+  - Generic `handleDatabaseChange()` replaces database-specific preference handlers
+  - Automatic registration of preference observers for all database plugins
+  - Module loading order optimized for new structure
 - **Code quality improvements** - Refactored preference access across all modules
   - Updated `rankings.js` to use new preference wrapper utilities (6 call sites)
   - Updated `overrides.js` to use new preference wrapper utilities (3 call sites)
   - Cleaner, more maintainable code with single source of truth for preference prefix
-- **Architecture improvements** - Modernized plugin structure following Zotero 7 best practices
+- **Bootstrap modernization** - Following Zotero 7 best practices
   - Bootstrap.js simplified from 130+ lines to ~70 lines (cleaner dispatcher pattern)
   - Lifecycle logic moved from bootstrap.js into dedicated `hooks.js` module
   - Module loading centralized in `loadModules()` function with clear dependency order
@@ -49,6 +79,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Cache is now automatically cleared when CORE is enabled/disabled
   - Item tree refreshes immediately to show updated rankings
   - Ensures rankings reflect current preference state
+
+### Technical
+- **Extensibility**: Adding new databases now requires only:
+  1. Create `src/databases/database-xxx.js` with matcher function
+  2. Register with `DatabaseRegistry.register({ id, name, prefKey, priority, matcher })`
+  3. Add preference to `prefs.js` and `preferences.xhtml` (if optional)
+  4. Add to build script
+  - **No changes to core logic required!**
+- **Module count**: 15 source files organized in 6 logical directories
+- **Build output**: 0.44 MB XPI (20 files total)
 
 
 ## [1.1.3] - 2025-11-09

@@ -7,7 +7,7 @@
 # XPI files are just ZIP files with a different extension
 
 $pluginName = "sjr-core-rankings"
-$version = "1.1.3"
+$version = "1.1.4"
 $outputFile = "$pluginName-$version.xpi"
 
 # Remove old XPI if it exists
@@ -27,28 +27,62 @@ if (Test-Path $tempDir) {
 New-Item -ItemType Directory -Path $tempDir | Out-Null
 
 # Copy plugin files to temp directory
-$filesToInclude = @(
+# Root files (required by Zotero)
+$rootFiles = @(
     "manifest.json",
     "bootstrap.js",
     "prefs.js",
     "logo.svg",
-    "preferences.xhtml",
-    "prefs-utils.js",
-    "data.js",
-    "matching.js",
-    "overrides.js",
-    "ui-utils.js",
-    "rankings.js",
-    "hooks.js"
+    "preferences.xhtml"
 )
 
-foreach ($file in $filesToInclude) {
+# Source files (organized in subdirectories)
+$sourceFiles = @(
+    # Core
+    "src\core\prefs-utils.js",
+    "src\core\rankings.js",
+    "src\core\hooks.js",
+    # Data
+    "src\data\data.js",
+    # Databases
+    "src\databases\database-registry.js",
+    "src\databases\database-sjr.js",
+    "src\databases\database-core.js",
+    # Engine
+    "src\engine\ranking-engine.js",
+    "src\engine\matching.js",
+    # UI
+    "src\ui\column-manager.js",
+    "src\ui\menu-manager.js",
+    "src\ui\window-manager.js",
+    "src\ui\ui-utils.js",
+    # Actions
+    "src\actions\ranking-actions.js",
+    "src\actions\overrides.js"
+)
+
+# Copy root files
+foreach ($file in $rootFiles) {
     $sourcePath = Join-Path $pluginDir $file
     $destPath = Join-Path $tempDir $file
     
     if (Test-Path $sourcePath) {
         Copy-Item $sourcePath $destPath
         Write-Host "Added: $file"
+    } else {
+        Write-Host "Warning: $file not found" -ForegroundColor Yellow
+    }
+}
+
+# Copy source files (flattened to root of XPI)
+foreach ($file in $sourceFiles) {
+    $sourcePath = Join-Path $pluginDir $file
+    $fileName = Split-Path $file -Leaf
+    $destPath = Join-Path $tempDir $fileName
+    
+    if (Test-Path $sourcePath) {
+        Copy-Item $sourcePath $destPath
+        Write-Host "Added: $fileName (from $file)"
     } else {
         Write-Host "Warning: $file not found" -ForegroundColor Yellow
     }

@@ -8,19 +8,38 @@
 
 <groupbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
           xmlns:html="http://www.w3.org/1999/xhtml">
-    <label><html:h2>Automatic Updates</html:h2></label>
-    <checkbox id="sjr-rankings-autoUpdate" 
-              label="Automatically update rankings when items are added or modified"
-              preference="extensions.sjr-core-rankings.autoUpdate"/>
+    <label><html:h2>Ranking Databases</html:h2></label>
+    <description style="margin-bottom: 10px;">Select which ranking databases to use for matching publications. SJR is always enabled as the primary journal ranking source.</description>
+    
+    <vbox style="margin-left: 20px;">
+        <checkbox id="sjr-rankings-enableSJR" 
+                  label="✓ SCImago Journal Rankings (SJR)"
+                  checked="true"
+                  disabled="true"/>
+        <description style="margin-left: 20px; margin-bottom: 10px; color: gray;">
+            Primary journal ranking database with quartile classifications (Q1-Q4). Always enabled.
+        </description>
+        
+        <checkbox id="sjr-rankings-enableCORE" 
+                  label="CORE Conference Rankings"
+                  preference="extensions.sjr-core-rankings.enableCORE"/>
+        <description style="margin-left: 20px; margin-bottom: 10px;">
+            Australian Computing Research and Education (CORE) conference rankings (A*, A, B, C).
+        </description>
+    </vbox>
+    
+    <description style="margin-top: 10px; font-style: italic;">
+        Note: Additional databases (JCR, Qualis, ERA) may be added in future versions.
+    </description>
 </groupbox>
 
 <groupbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
           xmlns:html="http://www.w3.org/1999/xhtml">
-    <label><html:h2>Conference Rankings</html:h2></label>
-    <checkbox id="sjr-rankings-enableCORE" 
-              label="Enable CORE conference rankings database"
-              preference="extensions.sjr-core-rankings.enableCORE"/>
-    <description style="margin-left: 20px;">When enabled, conference papers will be matched against the CORE rankings database.</description>
+    <label><html:h2>Automatic Updates</html:h2></label>
+    <checkbox id="sjr-rankings-autoUpdate" 
+              label="Automatically update rankings when items are added or modified"
+              preference="extensions.sjr-core-rankings.autoUpdate"/>
+    <description style="margin-left: 20px;">When enabled, rankings are automatically recalculated when you add or modify items in your library.</description>
 </groupbox>
 
 <groupbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
@@ -29,5 +48,5 @@
     <checkbox id="sjr-rankings-debugMode" 
               label="Enable debug mode"
               preference="extensions.sjr-core-rankings.debugMode"/>
-    <description style="margin-left: 20px;">Shows "Debug Ranking Match" menu item in the context menu for detailed matching algorithm logging.</description>
+    <description style="margin-left: 20px;">Shows "Debug Ranking Match" menu item for detailed matching algorithm logging in the Debug Output.</description>
 </groupbox>
