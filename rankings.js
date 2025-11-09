@@ -33,6 +33,7 @@ ZoteroRankings = {
 	columnDataKey: null,
 	windows: new Set(),  // Track windows we've added UI to
 	rankingCache: new Map(),  // Cache rankings to avoid recalculation
+	prefsObserverID: null,  // Track preference observer
 	
 	init: async function({ id, version, rootURI }) {
 			Zotero.debug("========================================");
@@ -135,7 +136,53 @@ ZoteroRankings = {
 			Zotero.logError("SJR & CORE Rankings: Failed to register notifier: " + e);
 		}
 		
+		// Register preference observer for debugMode changes
+		this.prefsObserverID = Zotero.Prefs.registerObserver('extensions.sjr-core-rankings.debugMode', this.handleDebugModeChange.bind(this), true);
+		
 		Zotero.debug("SJR & CORE Rankings initialized");
+	},
+	
+	// Handle debugMode preference changes
+	handleDebugModeChange: function(value) {
+		Zotero.debug(`SJR & CORE Rankings: Debug mode changed to ${value}`);
+		
+		// Update all windows
+		var windows = Zotero.getMainWindows();
+		for (let win of windows) {
+			var doc = win.document;
+			var debugMenuItem = doc.getElementById('zotero-rankings-context-debug');
+			var contextMenu = doc.getElementById('zotero-itemmenu');
+			
+			if (value) {
+				// Add debug menu item if not already present
+				if (!debugMenuItem && contextMenu) {
+					var contextMenuItem = doc.getElementById('zotero-rankings-context-update');
+					
+					// Create debug menu item
+					debugMenuItem = doc.createXULElement('menuitem');
+					debugMenuItem.id = 'zotero-rankings-context-debug';
+					debugMenuItem.setAttribute('label', 'Debug Ranking Match');
+					debugMenuItem.addEventListener('command', () => {
+						this.debugSelectedItems(win);
+					});
+					
+					// Insert after "Check Rankings" item
+					if (contextMenuItem && contextMenuItem.nextSibling) {
+						contextMenu.insertBefore(debugMenuItem, contextMenuItem.nextSibling);
+					} else if (contextMenuItem) {
+						contextMenu.appendChild(debugMenuItem);
+					}
+					
+					Zotero.debug("SJR & CORE Rankings: Debug menu item added");
+				}
+			} else {
+				// Remove debug menu item if present
+				if (debugMenuItem) {
+					debugMenuItem.remove();
+					Zotero.debug("SJR & CORE Rankings: Debug menu item removed");
+				}
+			}
+		}
 	},
 	
 	// Notifier callback - refresh item tree when items are added/modified
@@ -253,7 +300,12 @@ ZoteroRankings = {
 			
 			contextMenu.appendChild(contextSeparator);
 			contextMenu.appendChild(contextMenuItem);
-			contextMenu.appendChild(debugMenuItem);
+			
+			// Only add debug menu item if debug mode is enabled
+			if (Zotero.Prefs.get('extensions.sjr-core-rankings.debugMode', true)) {
+				contextMenu.appendChild(debugMenuItem);
+			}
+			
 			contextMenu.appendChild(manualMenuItem);
 			contextMenu.appendChild(clearMenuItem);
 			Zotero.debug("SJR & CORE Rankings: Context menu items added");
@@ -268,9 +320,14 @@ ZoteroRankings = {
 		
 		// Unregister the notifier
 		if (this.notifierID) {
-				Zotero.Notifier.unregisterObserver(this.notifierID);
-			}
-			
+			Zotero.Notifier.unregisterObserver(this.notifierID);
+		}
+		
+		// Unregister the preference observer
+		if (this.prefsObserverID) {
+			Zotero.Prefs.unregisterObserver(this.prefsObserverID);
+		}
+		
 		// Unregister the custom column
 		if (this.columnDataKey) {
 			Zotero.ItemTreeManager.unregisterColumn(this.columnDataKey);

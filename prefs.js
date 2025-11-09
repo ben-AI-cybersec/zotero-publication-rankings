@@ -13,3 +13,6 @@ pref("extensions.sjr-core-rankings.autoUpdate", true);
 
 // Enable CORE conference rankings database
 pref("extensions.sjr-core-rankings.enableCORE", true);
+
+// Enable debug mode (shows "Debug Ranking Match" in context menu)
+pref("extensions.sjr-core-rankings.debugMode", false);

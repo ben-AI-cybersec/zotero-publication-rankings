@@ -5,6 +5,23 @@ All notable changes to the SJR & CORE Rankings plugin for Zotero will be documen
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Debug mode preference** - New "Developer Options" section in preferences
+  - Checkbox to enable/disable debug mode (default: disabled)
+  - Controls visibility of "Debug Ranking Match" context menu item
+  - Dynamic updates without restart - menu item appears/disappears immediately when toggled
+  - Keeps UI clean for regular users while providing debugging tools for power users
+  - Uses preference observer for real-time menu updates across all windows
+
+### Changed
+-
+
+### Fixed
+-
+
+
 ## [1.1.3] - 2025-11-09
 
 ### Added

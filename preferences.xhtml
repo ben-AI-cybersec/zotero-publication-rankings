@@ -22,3 +22,12 @@
               preference="extensions.sjr-core-rankings.enableCORE"/>
     <description style="margin-left: 20px;">When enabled, conference papers will be matched against the CORE rankings database.</description>
 </groupbox>
+
+<groupbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+          xmlns:html="http://www.w3.org/1999/xhtml">
+    <label><html:h2>Developer Options</html:h2></label>
+    <checkbox id="sjr-rankings-debugMode" 
+              label="Enable debug mode"
+              preference="extensions.sjr-core-rankings.debugMode"/>
+    <description style="margin-left: 20px;">Shows "Debug Ranking Match" menu item in the context menu for detailed matching algorithm logging.</description>
+</groupbox>
