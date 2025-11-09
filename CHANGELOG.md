@@ -51,7 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **Architecture improvements** - Massive refactoring for extensibility and maintainability
-  - `RankingEngine` simplified from 252 → 132 lines (120 lines removed)
+  - `RankingEngine` simplified from 252 → 132 lines
   - Removed hardcoded SJR/CORE logic, now uses DatabaseRegistry
   - Generic `handleDatabaseChange()` replaces database-specific preference handlers
   - Automatic registration of preference observers for all database plugins
@@ -86,7 +86,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   2. Register with `DatabaseRegistry.register({ id, name, prefKey, priority, matcher })`
   3. Add preference to `prefs.js` and `preferences.xhtml` (if optional)
   4. Add to build script
-  - **No changes to core logic required!**
 - **Module count**: 15 source files organized in 6 logical directories
 - **Build output**: 0.44 MB XPI (20 files total)
 

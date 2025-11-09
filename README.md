@@ -20,7 +20,7 @@ A Zotero plugin that automatically displays journal and conference rankings in a
 
 ## Installation
 
-1. Download `sjr-core-rankings-1.1.0.xpi` from the [releases page](releases/)
+1. Download the latest `sjr-core-rankings-*.xpi` from the [releases page](https://github.com/ben-AI-cybersec/sjr-core-rankings-zotero-plugin/releases/latest)
 2. In Zotero 7: Tools → Add-ons → ⚙️ → "Install Add-on From File..."
 3. Select the `.xpi` file and restart Zotero
 4. Right-click column headers and enable the "Ranking" column
@@ -73,8 +73,16 @@ The sort order follows: A* > Q1/A > Q2/B > Q3/C > Q4 > National > Unranked
 ## Preferences
 
 Access via Edit → Preferences (Zotero → Settings on Mac), then select "Rankings":
-- **Auto-Update**: Enable/disable automatic ranking updates
-- **CORE Database**: Toggle conference rankings on/off
+
+### Ranking Databases
+- **SJR (SCImago Journal Rankings)**: Always enabled - 30,818+ journals
+- **CORE (Computing Research & Education)**: Toggleable - 2,107+ conferences
+
+### Auto-Update Settings
+- **Enable auto-update**: Automatically refresh rankings when viewing items
+
+### Developer Options
+- **Debug logging**: Enable detailed matching diagnostics in Debug Output
 
 ## Building from Source
 
@@ -108,12 +116,34 @@ cd sjr-core-rankings-zotero-plugin
 .\build.ps1
 ```
 
-This creates `sjr-core-rankings-1.1.0.xpi` ready for installation.
+This creates the `.xpi` file ready for installation (e.g., `sjr-core-rankings-1.1.4.xpi`).
 
 ## Project Structure
 
 ```
 sjr-core-rankings-zotero-plugin/
+├── src/                              # Source modules (organized by function)
+│   ├── core/                         # Core plugin functionality
+│   │   ├── rankings.js              # Main coordinator (226 lines)
+│   │   ├── hooks.js                 # Lifecycle event handlers
+│   │   └── prefs-utils.js           # Preference wrapper utilities
+│   ├── data/
+│   │   └── data.js                  # Rankings databases (32,934 lines)
+│   ├── databases/                    # Database registry & plugins
+│   │   ├── database-registry.js     # Central registry system
+│   │   ├── database-sjr.js          # SJR matching logic (145 lines)
+│   │   └── database-core.js         # CORE matching logic (47 lines)
+│   ├── engine/                       # Ranking engine
+│   │   ├── ranking-engine.js        # Core ranking coordinator (132 lines)
+│   │   └── matching.js              # String normalization & algorithms
+│   ├── ui/                           # User interface components
+│   │   ├── column-manager.js        # Column registration & caching (222 lines)
+│   │   ├── menu-manager.js          # Menu creation & handling (260 lines)
+│   │   ├── window-manager.js        # Window lifecycle tracking (108 lines)
+│   │   └── ui-utils.js              # UI formatting, colors, sorting
+│   └── actions/                      # User-triggered operations
+│       ├── ranking-actions.js       # Update, debug, manual ranking (334 lines)
+│       └── overrides.js             # Manual override persistence
 ├── update-scripts/                   # Data extraction scripts
 │   ├── scimagojr 2024.csv           # SJR source data
 │   ├── full_CORE.csv                # CORE source data
@@ -121,43 +151,87 @@ sjr-core-rankings-zotero-plugin/
 │   ├── extract_full_core.py         # Extract CORE rankings
 │   └── generate_data_js.py          # Combine into data.js
 ├── manifest.json                     # Plugin metadata
-├── bootstrap.js                      # Plugin lifecycle hooks
+├── bootstrap.js                      # Plugin lifecycle hooks & module loader
 ├── prefs.js                          # Default preferences
-├── data.js                           # Rankings databases (32,934 lines)
-├── matching.js                       # String normalization & matching algorithms
-├── overrides.js                      # Manual override persistence
-├── ui-utils.js                       # UI formatting, colors, sorting
-├── rankings.js                       # Main plugin coordination
 ├── preferences.xhtml                 # Settings UI
 ├── logo.svg                          # Plugin icon
 ├── build.ps1                         # Build script (creates XPI)
+├── ARCHITECTURE.md                   # Technical architecture documentation
 ├── README.md                         # This file
 ├── CHANGELOG.md                      # Version history
 ├── INSTALL.md                        # Installation guide
 └── LICENSE                           # GPLv3 license
 ```
 
-### Modular Architecture
+**Note**: The build process copies files from `src/` directories and flattens them to the XPI root.
 
-The plugin uses a modular architecture for better maintainability:
+### Modular Architecture (v1.1.4+)
 
-- **`bootstrap.js`** (115 lines) - Plugin lifecycle management, loads all modules
-- **`data.js`** (32,934 lines) - Ranking databases: `sjrRankings` (30,818 journals), `coreRankings` (2,107 conferences)
+The plugin uses an extensible modular architecture designed for maintainability and future growth:
+
+#### Core System
+- **`bootstrap.js`** - Plugin lifecycle management, loads all 15 modules in dependency order
+- **`rankings.js`** (226 lines) - Main coordinator, delegates to specialized modules
+- **`hooks.js`** - Zotero lifecycle event handlers (notifier, item observers)
+- **`prefs-utils.js`** - Preference storage wrapper with observer pattern
+
+#### Data Layer
+- **`data.js`** (32,934 lines) - Ranking databases
+  - `sjrRankings`: 30,818 journals with quartiles (Q1-Q4) and SJR scores
+  - `coreRankings`: 2,107 conferences with tiers (A*, A, B, C) and historical editions
+
+#### Database Registry System
+- **`database-registry.js`** (126 lines) - Central registry for all ranking databases
+  - Uniform plugin API: `register({ id, name, prefKey, priority, matcher })`
+  - Priority-based ordering (SJR=0, CORE=100)
+  - Generic enable/disable support for all databases
+- **`database-sjr.js`** (145 lines) - SJR matching strategies
+  - 3-tier matching: exact → fuzzy (85%+ similarity) → word overlap (66%+)
+  - Handles journal title variations and abbreviations
+- **`database-core.js`** (47 lines) - CORE conference matching
+  - 5-strategy matching: exact → substring → word overlap → acronym → year-flexible
+  - Delegates to `MatchingUtils` for algorithm implementation
+
+#### Ranking Engine
+- **`ranking-engine.js`** (132 lines, simplified from 252) - Core ranking retrieval
+  - Loops through enabled databases via `DatabaseRegistry.getEnabledDatabases()`
+  - No hardcoded database logic - fully extensible
+  - Extracts publication titles from Zotero items
 - **`matching.js`** (237 lines) - String normalization and matching algorithms
-  - 5-strategy CORE conference matching (exact → substring → word overlap → acronym)
-  - 3-strategy SJR journal matching with fuzzy logic
   - Exported as `MatchingUtils` global object
-- **`overrides.js`** (100 lines) - Manual ranking override management
-  - Persistent storage in Zotero preferences
+  - Shared utilities for all database plugins
+
+#### User Interface
+- **`column-manager.js`** (222 lines) - Custom column registration and display
+  - Column data provider with caching
+  - Cell rendering with color coding
+- **`menu-manager.js`** (260 lines) - Context menu and Tools menu integration
+  - Item-level and collection-level operations
+  - Dynamic menu item creation per window
+- **`window-manager.js`** (108 lines) - Window lifecycle tracking
+  - Manages multiple Zotero windows
+  - Cleanup on window close
+- **`ui-utils.js`** (133 lines) - UI formatting helpers
+  - Color coding: Green (A*/Q1) → Blue (A/Q2) → Orange (B/Q3) → Red (C/Q4)
+  - Sort value calculation for proper tier ordering
+
+#### User Actions
+- **`ranking-actions.js`** (334 lines) - User-triggered operations
+  - Batch ranking updates for selected items
+  - Debug matching with detailed logging
+  - Manual ranking override dialog
+- **`overrides.js`** (100 lines) - Manual override persistence
+  - Stored in Zotero preferences
   - Exported as `ManualOverrides` global object
-- **`ui-utils.js`** (133 lines) - UI formatting and display helpers
-  - Color coding (green for A*/Q1, blue for A/Q2, orange for B/Q3, red for C/Q4)
-  - Sort value calculation with inversion for proper ordering
-  - Exported as `UIUtils` global object
-- **`rankings.js`** (808 lines) - Main plugin coordination
-  - Zotero integration (custom column, context menus, notifier)
-  - Item tree display and caching
-  - Exported as `ZoteroRankings` global object (attached to `Zotero.SJRCoreRankings`)
+
+#### Extensibility
+Adding new ranking databases (JCR, Qualis, ERA, etc.) requires **zero core logic changes**:
+1. Create `src/databases/database-xxx.js` with a `match(item, data)` function
+2. Register with `DatabaseRegistry.register({ id, matcher, ... })`
+3. Add preference in `preferences.xhtml`
+4. The generic `handleDatabaseChange()` automatically supports the new database
+
+For detailed architecture documentation, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## Data Sources
 
