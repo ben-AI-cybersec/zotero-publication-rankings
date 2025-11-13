@@ -1,0 +1,37 @@
+# Normalize line endings and file attributes across Windows/WSL/macOS
+
+# Default: auto-detect text files and normalize to LF in repo
+* text=auto
+
+# Enforce LF for source and docs
+*.sh           text eol=lf
+*.js           text eol=lf
+*.json         text eol=lf
+*.md           text eol=lf
+*.xhtml        text eol=lf
+*.html         text eol=lf
+*.css          text eol=lf
+*.py           text eol=lf
+*.ts           text eol=lf
+*.tsx          text eol=lf
+*.mjs          text eol=lf
+
+# PowerShell scripts can remain CRLF-friendly on Windows
+*.ps1          text eol=crlf
+
+# Data files
+*.csv          text eol=lf
+
+# Binaries / archives (never touch EOLs)
+*.xpi          binary
+*.zip          binary
+*.png          binary
+*.jpg          binary
+*.jpeg         binary
+*.gif          binary
+
+# SVG as text (diffable)
+*.svg          text eol=lf
+
+# Ensure executable script bit tracked for POSIX shells
+build.sh       text eol=lf
