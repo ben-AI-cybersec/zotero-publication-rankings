@@ -1,5 +1,5 @@
 /*
- * SJR & CORE Rankings Plugin for Zotero 7
+ * Publication Rankings Plugin for Zotero 7
  * Default Preferences
  * 
  * Copyright (C) 2025 Ben Stephens
@@ -9,10 +9,10 @@
  */
 
 // Enable automatic ranking updates when items are added/modified
-pref("extensions.sjr-core-rankings.autoUpdate", true);
+pref("extensions.publication-rankings.autoUpdate", true);
 
 // Enable CORE conference rankings database
-pref("extensions.sjr-core-rankings.enableCORE", true);
+pref("extensions.publication-rankings.enableCORE", true);
 
 // Enable debug mode (shows "Debug Ranking Match" in context menu)
-pref("extensions.sjr-core-rankings.debugMode", false);
+pref("extensions.publication-rankings.debugMode", false);

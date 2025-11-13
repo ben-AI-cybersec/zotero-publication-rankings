@@ -1,5 +1,5 @@
 /*
- * SJR & CORE Rankings Plugin for Zotero 7
+ * Publication Rankings Plugin for Zotero 7
  * Ranking Actions - User-triggered operations
  * 
  * Copyright (C) 2025 Ben Stephens
@@ -38,7 +38,7 @@ var RankingActions = {
 		var ZoteroPane = window.ZoteroPane;
 		
 		if (!ZoteroPane) {
-			Zotero.debug("SJR & CORE Rankings: ZoteroPane not available in this window");
+			Zotero.debug("Publication Rankings: ZoteroPane not available in this window");
 			return;
 		}
 		
@@ -51,7 +51,7 @@ var RankingActions = {
 		
 		// Create progress window with proper configuration
 		var progressWin = new Zotero.ProgressWindow({ closeOnClick: true });
-		progressWin.changeHeadline("Checking SJR & CORE Rankings");
+		progressWin.changeHeadline("Checking Publication Rankings");
 		progressWin.show();
 		
 		var found = 0;
@@ -132,7 +132,7 @@ var RankingActions = {
 			
 			await Zotero.alert(window, "Rankings Check Complete", message);
 		} catch (e) {
-			Zotero.debug("SJR & CORE Rankings: Error in updateSelectedItems: " + e);
+			Zotero.debug("Publication Rankings: Error in updateSelectedItems: " + e);
 			progressWin.close();
 			throw e;
 		}
@@ -150,7 +150,7 @@ var RankingActions = {
 		var ZoteroPane = window.ZoteroPane;
 		
 		if (!ZoteroPane) {
-			Zotero.debug("SJR & CORE Rankings: ZoteroPane not available");
+			Zotero.debug("Publication Rankings: ZoteroPane not available");
 			return;
 		}
 		
@@ -181,7 +181,7 @@ var RankingActions = {
 			RankingEngine.getRanking(item, true);
 		}
 		
-		Zotero.debug("SJR & CORE Rankings: Debug matching complete");
+		Zotero.debug("Publication Rankings: Debug matching complete");
 	},
 	
 	/**

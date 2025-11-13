@@ -1,5 +1,5 @@
 /*
- * SJR & CORE Rankings - Lifecycle Hooks Module
+ * Publication Rankings - Lifecycle Hooks Module
  * Clean separation of plugin lifecycle event handling
  * 
  * Copyright (C) 2025 Ben Stephens
@@ -28,13 +28,13 @@ var Hooks = {
 	 */
 	async onStartup({ id, version, rootURI }) {
 		Zotero.debug("========================================");
-		Zotero.debug(`SJR & CORE Rankings: Startup - Version ${version}`);
+		Zotero.debug(`Publication Rankings: Startup - Version ${version}`);
 		Zotero.debug("========================================");
 		
 		// Register preference pane using official Zotero 7 API
-		Zotero.debug("SJR & CORE Rankings: Registering preference pane");
+		Zotero.debug("Publication Rankings: Registering preference pane");
 		Zotero.PreferencePanes.register({
-			pluginID: 'sjr-core-rankings@zotero.org',
+			pluginID: 'publication-rankings@zotero.org',
 			src: rootURI + 'preferences.xhtml',
 			label: 'Rankings'
 		});
@@ -45,14 +45,14 @@ var Hooks = {
 		}
 		
 		// Initialize the plugin
-		Zotero.debug("SJR & CORE Rankings: Initializing plugin");
+		Zotero.debug("Publication Rankings: Initializing plugin");
 		await Zotero.SJRCoreRankings.init({ id, version, rootURI });
 		
 		// Add UI to all existing windows
-		Zotero.debug("SJR & CORE Rankings: Adding UI to existing windows");
+		Zotero.debug("Publication Rankings: Adding UI to existing windows");
 		Zotero.SJRCoreRankings.addToAllWindows();
 		
-		Zotero.debug("SJR & CORE Rankings: Startup complete");
+		Zotero.debug("Publication Rankings: Startup complete");
 	},
 	
 	/**
@@ -71,7 +71,7 @@ var Hooks = {
 			return;
 		}
 		
-		Zotero.debug("SJR & CORE Rankings: Shutting down plugin");
+		Zotero.debug("Publication Rankings: Shutting down plugin");
 		
 		if (Zotero.SJRCoreRankings) {
 			// Remove UI from all windows and clean up observers
@@ -81,7 +81,7 @@ var Hooks = {
 			delete Zotero.SJRCoreRankings;
 		}
 		
-		Zotero.debug("SJR & CORE Rankings: Shutdown complete");
+		Zotero.debug("Publication Rankings: Shutdown complete");
 	},
 	
 	/**
@@ -91,7 +91,7 @@ var Hooks = {
 	 * @param {Window} params.window - The window being loaded
 	 */
 	onMainWindowLoad({ window }) {
-		Zotero.debug("SJR & CORE Rankings: Main window loading");
+		Zotero.debug("Publication Rankings: Main window loading");
 		Zotero.SJRCoreRankings?.addToWindow(window);
 	},
 	
@@ -102,7 +102,7 @@ var Hooks = {
 	 * @param {Window} params.window - The window being unloaded
 	 */
 	onMainWindowUnload({ window }) {
-		Zotero.debug("SJR & CORE Rankings: Main window unloading");
+		Zotero.debug("Publication Rankings: Main window unloading");
 		Zotero.SJRCoreRankings?.removeFromWindow(window);
 	}
 };

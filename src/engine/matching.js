@@ -1,5 +1,5 @@
 /*
- * SJR & CORE Rankings - Matching Module
+ * Publication Rankings - Matching Module
  * String normalization and ranking matching algorithms
  * 
  * Copyright (C) 2025 Ben Stephens

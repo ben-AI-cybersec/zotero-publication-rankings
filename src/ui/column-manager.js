@@ -1,5 +1,5 @@
 /*
- * SJR & CORE Rankings Plugin for Zotero 7
+ * Publication Rankings Plugin for Zotero 7
  * Column Manager - Custom column registration and caching
  * 
  * Copyright (C) 2025 Ben Stephens
@@ -37,24 +37,24 @@ var ColumnManager = {
 	 * await ColumnManager.register();
 	 */
 	register: async function() {
-		Zotero.debug("SJR & CORE Rankings: Attempting to register column");
+		Zotero.debug("Publication Rankings: Attempting to register column");
 		
 		try {
 			this.columnDataKey = await Zotero.ItemTreeManager.registerColumn({
 				dataKey: 'ranking',
 				label: 'Ranking',
-				pluginID: 'sjr-core-rankings@zotero.org',
+				pluginID: 'publication-rankings@zotero.org',
 				dataProvider: this.dataProvider.bind(this),
 				renderCell: this.renderCell.bind(this),
 				sortingKey: this.sortingKey.bind(this),
 				zoteroPersist: ['width', 'ordinal', 'hidden', 'sortDirection']
 			});
 			
-			Zotero.debug("SJR & CORE Rankings: Column registered with dataKey: " + this.columnDataKey);
+			Zotero.debug("Publication Rankings: Column registered with dataKey: " + this.columnDataKey);
 			return this.columnDataKey;
 		}
 		catch (e) {
-			Zotero.logError("SJR & CORE Rankings: Failed to register column: " + e);
+			Zotero.logError("Publication Rankings: Failed to register column: " + e);
 			throw e;
 		}
 	},
@@ -65,7 +65,7 @@ var ColumnManager = {
 	unregister: function() {
 		if (this.columnDataKey) {
 			Zotero.ItemTreeManager.unregisterColumn(this.columnDataKey);
-			Zotero.debug("SJR & CORE Rankings: Column unregistered");
+			Zotero.debug("Publication Rankings: Column unregistered");
 		}
 	},
 	
@@ -191,7 +191,7 @@ var ColumnManager = {
 	 */
 	clearAllCache: function() {
 		this.rankingCache.clear();
-		Zotero.debug(`SJR & CORE Rankings: Cache cleared (${this.rankingCache.size} items)`);
+		Zotero.debug(`Publication Rankings: Cache cleared (${this.rankingCache.size} items)`);
 	},
 	
 	/**

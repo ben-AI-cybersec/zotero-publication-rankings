@@ -1,5 +1,5 @@
 /*
- * SJR & CORE Rankings - Preference Utilities
+ * Publication Rankings - Preference Utilities
  * Wrapper functions for consistent preference access
  * 
  * Copyright (C) 2025 Ben Stephens
@@ -15,7 +15,7 @@
  * Preference key prefix for this plugin
  * All preferences are stored under this namespace
  */
-const PREFS_PREFIX = 'extensions.sjr-core-rankings';
+const PREFS_PREFIX = 'extensions.publication-rankings';
 
 /**
  * Get a preference value

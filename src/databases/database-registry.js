@@ -35,7 +35,7 @@ var DatabaseRegistry = {
 		}
 
 		if (this.databases.has(config.id)) {
-			Zotero.debug(`SJR & CORE Rankings: Overwriting database registration for '${config.id}'`);
+			Zotero.debug(`Publication Rankings: Overwriting database registration for '${config.id}'`);
 		}
 
 		// Store the database configuration
@@ -47,7 +47,7 @@ var DatabaseRegistry = {
 			matcher: config.matcher
 		});
 
-		Zotero.debug(`SJR & CORE Rankings: Registered database '${config.name}' (priority ${config.priority || 999})`);
+		Zotero.debug(`Publication Rankings: Registered database '${config.name}' (priority ${config.priority || 999})`);
 	},
 
 	/**
@@ -111,7 +111,7 @@ var DatabaseRegistry = {
 	 */
 	clear: function() {
 		this.databases.clear();
-		Zotero.debug('SJR & CORE Rankings: Database registry cleared');
+		Zotero.debug('Publication Rankings: Database registry cleared');
 	},
 
 	/**
@@ -120,7 +120,7 @@ var DatabaseRegistry = {
 	 * if databases need initialization logic
 	 */
 	initialize: function() {
-		Zotero.debug('SJR & CORE Rankings: Database registry initialized');
-		Zotero.debug(`SJR & CORE Rankings: ${this.databases.size} databases registered`);
+		Zotero.debug('Publication Rankings: Database registry initialized');
+		Zotero.debug(`Publication Rankings: ${this.databases.size} databases registered`);
 	}
 };

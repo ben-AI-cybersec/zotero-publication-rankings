@@ -1,14 +1,14 @@
 #!/bin/bash
 # Build script to create Zotero plugin XPI file
-# SJR & CORE Rankings Plugin for Zotero 7
+# Publication Rankings Plugin for Zotero 7
 #
 # Copyright (C) 2025 Ben Stephens
 # Licensed under GNU General Public License v3.0 (GPLv3)
 #
 # XPI files are just ZIP files with a different extension
 
-pluginName="sjr-core-rankings"
-version="1.1.4"
+pluginName="publication-rankings"
+version="0.1.0"
 outputFile="${pluginName}-${version}.xpi"
 
 # Remove old XPI if it exists

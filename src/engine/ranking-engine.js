@@ -1,5 +1,5 @@
 /*
- * SJR & CORE Rankings Plugin for Zotero 7
+ * Publication Rankings Plugin for Zotero 7
  * Ranking matching engine - Pure logic with no UI dependencies
  * 
  * Copyright (C) 2025 Ben Stephens

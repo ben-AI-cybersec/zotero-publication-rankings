@@ -1,5 +1,5 @@
 /*
- * SJR & CORE Rankings Plugin for Zotero 7
+ * Publication Rankings Plugin for Zotero 7
  * Bootstrap - Plugin lifecycle dispatcher
  * 
  * Copyright (C) 2025 Ben Stephens
@@ -73,7 +73,7 @@ function loadModules(rootURI) {
 	
 	for (const module of modules) {
 		Services.scriptloader.loadSubScript(rootURI + module);
-		Zotero.debug(`SJR & CORE Rankings: Loaded ${module}`);
+		Zotero.debug(`Publication Rankings: Loaded ${module}`);
 	}
 }
 

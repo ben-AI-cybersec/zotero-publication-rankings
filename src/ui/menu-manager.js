@@ -1,5 +1,5 @@
 /*
- * SJR & CORE Rankings Plugin for Zotero 7
+ * Publication Rankings Plugin for Zotero 7
  * Menu Manager - UI menu creation and management
  * 
  * Copyright (C) 2025 Ben Stephens
@@ -46,11 +46,11 @@ var MenuManager = {
 	addToWindow: function(window, handlers) {
 		var doc = window.document;
 		
-		Zotero.debug("SJR & CORE Rankings: Adding menu to window");
+		Zotero.debug("Publication Rankings: Adding menu to window");
 		
 		// Wait for document to be ready
 		if (doc.readyState !== 'complete') {
-			Zotero.debug("SJR & CORE Rankings: Document not ready, waiting...");
+			Zotero.debug("Publication Rankings: Document not ready, waiting...");
 			window.addEventListener('load', () => {
 				this.addToWindow(window, handlers);
 			}, { once: true });
@@ -97,7 +97,7 @@ var MenuManager = {
 	addToolsMenuItems: function(doc, handlers) {
 		var toolsMenu = doc.getElementById('menu_ToolsPopup');
 		if (!toolsMenu) {
-			Zotero.debug("SJR & CORE Rankings: Tools menu not found");
+			Zotero.debug("Publication Rankings: Tools menu not found");
 			return;
 		}
 		
@@ -106,14 +106,14 @@ var MenuManager = {
 		separator.id = 'zotero-rankings-separator';
 		toolsMenu.appendChild(separator);
 		
-		// Create "Check SJR & CORE Rankings" menu item
+		// Create "Check Publication Rankings" menu item
 		var menuItem = doc.createXULElement('menuitem');
 		menuItem.id = 'zotero-rankings-update';
-		menuItem.setAttribute('label', 'Check SJR & CORE Rankings');
+		menuItem.setAttribute('label', 'Check Publication Rankings');
 		menuItem.addEventListener('command', handlers.onCheckRankings);
 		toolsMenu.appendChild(menuItem);
 		
-		Zotero.debug("SJR & CORE Rankings: Menu item added to Tools menu");
+		Zotero.debug("Publication Rankings: Menu item added to Tools menu");
 	},
 	
 	/**
@@ -126,7 +126,7 @@ var MenuManager = {
 	addContextMenuItems: function(doc, handlers) {
 		var contextMenu = doc.getElementById('zotero-itemmenu');
 		if (!contextMenu) {
-			Zotero.debug("SJR & CORE Rankings: Context menu not found");
+			Zotero.debug("Publication Rankings: Context menu not found");
 			return;
 		}
 		
@@ -139,7 +139,7 @@ var MenuManager = {
 		var menuItems = [
 			{
 				id: 'zotero-rankings-context-update',
-				label: 'Check SJR & CORE Rankings',
+				label: 'Check Publication Rankings',
 				handler: handlers.onCheckRankings,
 				condition: () => true  // Always show
 			},
@@ -171,7 +171,7 @@ var MenuManager = {
 			}
 		}
 		
-		Zotero.debug("SJR & CORE Rankings: Context menu items added");
+		Zotero.debug("Publication Rankings: Context menu items added");
 	},
 	
 	/**
@@ -228,7 +228,7 @@ var MenuManager = {
 			contextMenu.appendChild(debugMenuItem);
 		}
 		
-		Zotero.debug("SJR & CORE Rankings: Debug menu item added");
+		Zotero.debug("Publication Rankings: Debug menu item added");
 	},
 	
 	/**
@@ -241,7 +241,7 @@ var MenuManager = {
 	 */
 	removeDebugMenuItem: function(doc) {
 		this.removeElement(doc, 'zotero-rankings-context-debug');
-		Zotero.debug("SJR & CORE Rankings: Debug menu item removed");
+		Zotero.debug("Publication Rankings: Debug menu item removed");
 	},
 	
 	/**

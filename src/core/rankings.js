@@ -1,5 +1,5 @@
 /*
- * SJR & CORE Rankings Plugin for Zotero 7
+ * Publication Rankings Plugin for Zotero 7
  * Core Functionality - Main coordinator
  * 
  * Delegates to specialized modules:
@@ -59,7 +59,7 @@ ZoteroRankings = {
 		try {
 			this.notifierID = Zotero.Notifier.registerObserver(this, ['item'], 'rankings');
 		} catch (e) {
-			Zotero.logError("SJR & CORE Rankings: Failed to register notifier: " + e);
+			Zotero.logError("Publication Rankings: Failed to register notifier: " + e);
 		}
 		
 		// Register preference observers
@@ -68,7 +68,7 @@ ZoteroRankings = {
 		// Register observers for all database preferences
 		this.registerDatabaseObservers();
 		
-		Zotero.debug("SJR & CORE Rankings initialized");
+		Zotero.debug("Publication Rankings initialized");
 	},
 	
 	// Register preference observers for all databases with optional preferences
@@ -89,14 +89,14 @@ ZoteroRankings = {
 						}.bind(this);
 					}.bind(this))(dbId)
 				);
-				Zotero.debug(`SJR & CORE Rankings: Registered observer for ${db.name} (${db.prefKey})`);
+				Zotero.debug(`Publication Rankings: Registered observer for ${db.name} (${db.prefKey})`);
 			}
 		}
 	},
 	
 	// Handle debugMode preference changes - update debug menu items in all windows
 	handleDebugModeChange: function(value) {
-		Zotero.debug(`SJR & CORE Rankings: Debug mode changed to ${value}`);
+		Zotero.debug(`Publication Rankings: Debug mode changed to ${value}`);
 		
 		// Update all windows
 		var windows = Zotero.getMainWindows();
@@ -119,11 +119,11 @@ ZoteroRankings = {
 	handleDatabaseChange: function(dbId, value) {
 		var db = DatabaseRegistry.getDatabase(dbId);
 		if (!db) {
-			Zotero.logError(`SJR & CORE Rankings: Unknown database ID: ${dbId}`);
+			Zotero.logError(`Publication Rankings: Unknown database ID: ${dbId}`);
 			return;
 		}
 		
-		Zotero.debug(`SJR & CORE Rankings: Database ${db.name} ${value ? 'enabled' : 'disabled'}`);
+		Zotero.debug(`Publication Rankings: Database ${db.name} ${value ? 'enabled' : 'disabled'}`);
 		
 		// Clear the ranking cache so items are re-evaluated
 		ColumnManager.clearAllCache();
@@ -133,7 +133,7 @@ ZoteroRankings = {
 		for (let win of windows) {
 			if (win.ZoteroPane && win.ZoteroPane.itemsView) {
 				win.ZoteroPane.itemsView.refreshAndMaintainSelection();
-				Zotero.debug("SJR & CORE Rankings: Item tree refreshed");
+				Zotero.debug("Publication Rankings: Item tree refreshed");
 			}
 		}
 	},
@@ -157,10 +157,10 @@ ZoteroRankings = {
 		// Trigger refresh for affected items
 		try {
 			Zotero.Notifier.trigger('refresh', 'itemtree', []);
-			Zotero.debug("SJR & CORE Rankings: Triggered item tree refresh and cache clear for " + ids.length + " items");
+			Zotero.debug("Publication Rankings: Triggered item tree refresh and cache clear for " + ids.length + " items");
 		}
 		catch (e) {
-			Zotero.logError("SJR & CORE Rankings: Error refreshing item tree: " + e);
+			Zotero.logError("Publication Rankings: Error refreshing item tree: " + e);
 		}
 	},
 	
@@ -176,7 +176,7 @@ ZoteroRankings = {
 	addToWindow: function(window) {
 		// Avoid adding twice to the same window
 		if (WindowManager.hasWindow(window)) {
-			Zotero.debug("SJR & CORE Rankings: Window already has UI, skipping");
+			Zotero.debug("Publication Rankings: Window already has UI, skipping");
 			return;
 		}
 		

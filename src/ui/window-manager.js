@@ -1,5 +1,5 @@
 /*
- * SJR & CORE Rankings Plugin for Zotero 7
+ * Publication Rankings Plugin for Zotero 7
  * Window Manager - Window lifecycle tracking
  * 
  * Copyright (C) 2025 Ben Stephens
@@ -37,7 +37,7 @@ var WindowManager = {
 	 */
 	trackWindow: function(window) {
 		this.windows.add(window);
-		Zotero.debug(`SJR & CORE Rankings: Tracking window (${this.windows.size} total)`);
+		Zotero.debug(`Publication Rankings: Tracking window (${this.windows.size} total)`);
 	},
 	
 	/**
@@ -50,7 +50,7 @@ var WindowManager = {
 	 */
 	untrackWindow: function(window) {
 		this.windows.delete(window);
-		Zotero.debug(`SJR & CORE Rankings: Untracked window (${this.windows.size} remaining)`);
+		Zotero.debug(`Publication Rankings: Untracked window (${this.windows.size} remaining)`);
 	},
 	
 	/**
@@ -102,7 +102,7 @@ var WindowManager = {
 	 * WindowManager.clearAll();
 	 */
 	clearAll: function() {
-		Zotero.debug(`SJR & CORE Rankings: Clearing ${this.windows.size} tracked windows`);
+		Zotero.debug(`Publication Rankings: Clearing ${this.windows.size} tracked windows`);
 		this.windows.clear();
 	}
 };

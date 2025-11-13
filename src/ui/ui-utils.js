@@ -1,5 +1,5 @@
 /*
- * SJR & CORE Rankings - UI Utilities Module
+ * Publication Rankings - UI Utilities Module
  * Helper functions for colors, sorting, and display formatting
  * 
  * Copyright (C) 2025 Ben Stephens

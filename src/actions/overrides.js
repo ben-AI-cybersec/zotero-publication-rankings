@@ -1,5 +1,5 @@
 /*
- * SJR & CORE Rankings - Manual Overrides Module
+ * Publication Rankings - Manual Overrides Module
  * Manages user-defined manual ranking overrides with persistent storage
  * 
  * Copyright (C) 2025 Ben Stephens
@@ -27,17 +27,17 @@ var ManualOverrides = {
 			
 			const trimmedData = data.trim();
 			if (!trimmedData || trimmedData === '{}') {
-				Zotero.debug("SJR & CORE Rankings: No manual overrides data, initializing empty");
+				Zotero.debug("Publication Rankings: No manual overrides data, initializing empty");
 				this.overrides = new Map();
 				return;
 			}
 			
 			const parsed = JSON.parse(trimmedData);
 			this.overrides = new Map(Object.entries(parsed));
-			Zotero.debug(`SJR & CORE Rankings: Loaded ${this.overrides.size} manual overrides`);
-			Zotero.debug(`SJR & CORE Rankings: Raw data: ${data}`);
+			Zotero.debug(`Publication Rankings: Loaded ${this.overrides.size} manual overrides`);
+			Zotero.debug(`Publication Rankings: Raw data: ${data}`);
 		} catch (e) {
-			Zotero.logError("SJR & CORE Rankings: Error loading manual overrides: " + e);
+			Zotero.logError("Publication Rankings: Error loading manual overrides: " + e);
 			this.overrides = new Map();
 			setPref('manualOverrides', '{}');
 		}
@@ -54,10 +54,10 @@ var ManualOverrides = {
 			const obj = Object.fromEntries(this.overrides);
 			const jsonString = JSON.stringify(obj);
 			setPref('manualOverrides', jsonString);
-			Zotero.debug(`SJR & CORE Rankings: Saved ${this.overrides.size} manual overrides`);
-			Zotero.debug(`SJR & CORE Rankings: Saved data: ${jsonString}`);
+			Zotero.debug(`Publication Rankings: Saved ${this.overrides.size} manual overrides`);
+			Zotero.debug(`Publication Rankings: Saved data: ${jsonString}`);
 		} catch (e) {
-			Zotero.logError("SJR & CORE Rankings: Error saving manual overrides: " + e);
+			Zotero.logError("Publication Rankings: Error saving manual overrides: " + e);
 		}
 	},
 	
@@ -72,7 +72,7 @@ var ManualOverrides = {
 		const normalizedTitle = publicationTitle.toLowerCase().trim();
 		this.overrides.set(normalizedTitle, ranking);
 		await this.save();
-		Zotero.debug(`SJR & CORE Rankings: Set manual override for "${publicationTitle}" -> "${ranking}"`);
+		Zotero.debug(`Publication Rankings: Set manual override for "${publicationTitle}" -> "${ranking}"`);
 	},
 	
 	/**
@@ -85,7 +85,7 @@ var ManualOverrides = {
 		const normalizedTitle = publicationTitle.toLowerCase().trim();
 		this.overrides.delete(normalizedTitle);
 		await this.save();
-		Zotero.debug(`SJR & CORE Rankings: Removed manual override for "${publicationTitle}"`);
+		Zotero.debug(`Publication Rankings: Removed manual override for "${publicationTitle}"`);
 	},
 	
 	/**
@@ -127,6 +127,6 @@ var ManualOverrides = {
 	clearAll: async function() {
 		this.overrides.clear();
 		await this.save();
-		Zotero.debug("SJR & CORE Rankings: Cleared all manual overrides");
+		Zotero.debug("Publication Rankings: Cleared all manual overrides");
 	}
 };

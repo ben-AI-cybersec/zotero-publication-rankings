@@ -1,5 +1,5 @@
 <!--
-  SJR & CORE Rankings Plugin for Zotero 7
+  Publication Rankings Plugin for Zotero 7
   Preferences UI
   
   Copyright (C) 2025 Ben Stephens
@@ -12,7 +12,7 @@
     <description style="margin-bottom: 10px;">Select which ranking databases to use for matching publications. SJR is always enabled as the primary journal ranking source.</description>
     
     <vbox style="margin-left: 20px;">
-        <checkbox id="sjr-rankings-enableSJR" 
+        <checkbox id="publication-rankings-enableSJR" 
                   label="✓ SCImago Journal Rankings (SJR)"
                   checked="true"
                   disabled="true"/>
@@ -20,9 +20,9 @@
             Primary journal ranking database with quartile classifications (Q1-Q4). Always enabled.
         </description>
         
-        <checkbox id="sjr-rankings-enableCORE" 
+        <checkbox id="publication-rankings-enableCORE" 
                   label="CORE Conference Rankings"
-                  preference="extensions.sjr-core-rankings.enableCORE"/>
+                  preference="extensions.publication-rankings.enableCORE"/>
         <description style="margin-left: 20px; margin-bottom: 10px;">
             Australian Computing Research and Education (CORE) conference rankings (A*, A, B, C).
         </description>
@@ -36,17 +36,17 @@
 <groupbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
           xmlns:html="http://www.w3.org/1999/xhtml">
     <label><html:h2>Automatic Updates</html:h2></label>
-    <checkbox id="sjr-rankings-autoUpdate" 
+    <checkbox id="publication-rankings-autoUpdate" 
               label="Automatically update rankings when items are added or modified"
-              preference="extensions.sjr-core-rankings.autoUpdate"/>
+              preference="extensions.publication-rankings.autoUpdate"/>
     <description style="margin-left: 20px;">When enabled, rankings are automatically recalculated when you add or modify items in your library.</description>
 </groupbox>
 
 <groupbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
           xmlns:html="http://www.w3.org/1999/xhtml">
     <label><html:h2>Developer Options</html:h2></label>
-    <checkbox id="sjr-rankings-debugMode" 
+    <checkbox id="publication-rankings-debugMode" 
               label="Enable debug mode"
-              preference="extensions.sjr-core-rankings.debugMode"/>
+              preference="extensions.publication-rankings.debugMode"/>
     <description style="margin-left: 20px;">Shows "Debug Ranking Match" menu item for detailed matching algorithm logging in the Debug Output.</description>
 </groupbox>
