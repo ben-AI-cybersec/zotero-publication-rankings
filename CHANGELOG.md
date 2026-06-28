@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-6-28
+
 - merged jkour's work on VHB publication rankings
 - Bump Zotero version supported to v 9.x
 - updated CORE and SJR databases
