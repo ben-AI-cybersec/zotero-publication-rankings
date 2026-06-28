@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- merged jkour's work on VHB publication rankings
+- Bump Zotero version supported to v 9.x
+- updated CORE and SJR databases
+- updated CORE logic to use most recent database from ICORE
+
 ## [0.3.0] - 2026-1-16
 - Updated the color and sort order methods to include the database id
 - Updated the version of the plugin to work in Zotero 8
