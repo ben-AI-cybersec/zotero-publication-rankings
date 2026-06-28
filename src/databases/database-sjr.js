@@ -111,11 +111,11 @@ var SJRDatabase = {
 			// Use stricter criteria to avoid false positives:
 			// 1. Require 85% overlap from SJR side
 			// 2. Require 80% overlap from search side (allows "Proceedings of...")
-			// 3. Require longer titles (5+ words instead of 4+)
+			// 3. Require at least 4 significant words to avoid false positives
 			var sjrOverlap = matchCount / sjrWords.length;
 			var searchOverlap = matchCount / searchWords.length;
 			
-			if (sjrWords.length >= 5 && 
+			if (sjrWords.length >= 4 && 
 			    sjrOverlap >= 0.85 && 
 			    searchOverlap >= 0.80) {
 				var sjrData = sjrRankings[sjrTitle];

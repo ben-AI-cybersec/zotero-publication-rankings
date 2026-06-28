@@ -1,15 +1,27 @@
 import csv
 import json
 import os
+import re
 
 def extract_full_core_rankings(csv_file='full_CORE.csv'):
     """
     Extract comprehensive CORE conference rankings from full CSV file.
     Includes: Main CORE ranks (A*, A, B, C), Australasian, and National rankings.
-    Also includes historical data (2021, 2023 editions).
+    Prioritises the most recent source edition (e.g. ICORE2026 > CORE2023 > CORE2021).
     Returns a dictionary mapping conference names to their rankings.
     """
     core_rankings = {}
+    best_entries = {}
+
+    def extract_source_year(source):
+        match = re.search(r'(19|20)\d{2}', source)
+        return int(match.group(0)) if match else 0
+
+    def source_priority(source):
+        source_upper = source.upper()
+        year = extract_source_year(source_upper)
+        # Prefer newer years first, then prefer ICORE over CORE/others when years tie.
+        return (year, 1 if source_upper.startswith('ICORE') else 0, 1 if source_upper.startswith('CORE') else 0)
     
     with open(csv_file, 'r', encoding='utf-8') as f:
         reader = csv.reader(f)
@@ -19,34 +31,46 @@ def extract_full_core_rankings(csv_file='full_CORE.csv'):
         print("\nProcessing conferences...\n")
         
         for row in reader:
-            if len(row) < 9:
+            if len(row) < 5:
                 print(f"Ignored row: [{row}]")
                 continue
             
             # Extract fields
             conference_name = row[1].strip()  # Title
-            rank_2023 = row[4].strip()  # 2023 Rank
-            rank_2021 = row[5].strip()  # 2021 Rank
+            source = row[3].strip()  # e.g. CORE2023, ICORE2026
+            raw_rank = row[4].strip()  # e.g. A*, A, B, C, TBR, Australasian, National
             
             if not conference_name:
                 continue
             
-            # Primary ranking: use 2023, fall back to 2021
-            primary_rank = rank_2023 if rank_2023 else rank_2021
-            
-            # Store the primary ranking with edition info
-            if primary_rank in ['A*', 'A', 'B', 'C']:
-                edition = '2023' if rank_2023 else '2021'
-                core_rankings[conference_name] = f"{primary_rank} [{edition}]"
+            # Store valid rankings and keep only the highest-priority source for each conference.
+            if raw_rank in ['A*', 'A', 'B', 'C']:
+                edition_year = extract_source_year(source)
+                edition = str(edition_year) if edition_year else source
+                normalized_rank = f"{raw_rank} [{edition}]"
             # Australasian rankings
-            elif primary_rank.startswith('Australasian'):
-                core_rankings[conference_name] = primary_rank.replace('Australasian', 'Au')
+            elif raw_rank.startswith('Australasian'):
+                normalized_rank = raw_rank.replace('Australasian', 'Au')
             # National rankings  
-            elif primary_rank.startswith('National'):
-                core_rankings[conference_name] = primary_rank.replace('National', 'Nat')
+            elif raw_rank.startswith('National'):
+                normalized_rank = raw_rank.replace('National', 'Nat')
             # TBR (To Be Ranked)
-            elif primary_rank == 'TBR':
-                core_rankings[conference_name] = 'TBR'
+            elif raw_rank == 'TBR':
+                normalized_rank = 'TBR'
+            else:
+                continue
+
+            candidate_priority = source_priority(source)
+            current = best_entries.get(conference_name)
+
+            if current is None or candidate_priority > current['priority']:
+                best_entries[conference_name] = {
+                    'priority': candidate_priority,
+                    'rank': normalized_rank
+                }
+
+    for conference_name, data in best_entries.items():
+        core_rankings[conference_name] = data['rank']
     
     print(f"Total conferences extracted: {len(core_rankings)}")
     

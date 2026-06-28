@@ -65,7 +65,7 @@ def generate_javascript_dict(sjr_dict, output_file='sjr_rankings.js'):
     print(f"JavaScript dictionary saved to {output_file}")
 
 if __name__ == "__main__":
-    csv_file = "scimagojr 2024.csv"
+    csv_file = "scimagojr 2025.csv"
     
     if os.path.exists(csv_file):
         print('Import file exists')
