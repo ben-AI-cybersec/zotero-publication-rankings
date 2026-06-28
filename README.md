@@ -1,4 +1,4 @@
-# Publication Rankings for Zotero 7
+# Publication Rankings for Zotero 7+
 
 [![GitHub release](https://img.shields.io/github/v/release/ben-AI-cybersec/zotero-publication-rankings?style=for-the-badge)](https://github.com/ben-AI-cybersec/zotero-publication-rankings/releases/latest) [![Downloads](https://img.shields.io/github/downloads/ben-AI-cybersec/zotero-publication-rankings/total?style=for-the-badge&color=forestgreen)](https://github.com/ben-AI-cybersec/zotero-publication-rankings/releases) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge)](https://www.gnu.org/licenses/gpl-3.0)
 
@@ -11,6 +11,7 @@ A Zotero plugin that automatically displays journal and conference rankings in a
 - **CORE Conference Rankings**: 2,107+ conferences (A*, A, B, C) with historical editions
 - **ABS Rankings**: 1,822 journals
 - **FT50 Rankings**: 50 journals
+- **VHB Rating**: 94 journals
 - **Color-Coded Display**: Green (Q1/A*) → Blue (Q2/A) → Orange (Q3/B) → Red (Q4/C)
 <img src="assets/Rankings_Text.png" style="width: 300px; display: block; margin: 0 auto;">
 
@@ -31,7 +32,7 @@ A Zotero plugin that automatically displays journal and conference rankings in a
 ## Installation
 
 1. Download the latest `publication-rankings-*.xpi` from the [releases page](https://github.com/ben-AI-cybersec/zotero-publication-rankings/releases/latest)
-2. In Zotero 7: Tools → Add-ons → ⚙️ → "Install Add-on From File..."
+2. In Zotero 7+: Tools → Add-ons → ⚙️ → "Install Add-on From File..."
 3. Select the `.xpi` file and restart Zotero
 4. Right-click column headers and enable the "Ranking" column
 
@@ -100,8 +101,9 @@ Access via Edit → Preferences (Zotero → Settings on Mac), then select "Ranki
 ### Ranking Databases
 - **SJR (SCImago Journal Rankings)**: Always enabled - 30,818+ journals
 - **CORE (Computing Research & Education)**: Toggleable - 2,173+ conferences
-- **ABS Rankings***: Toggleable - 1,822 journals
-- **FT50 Rankings***: Toggleable - 50 journals
+- **ABS Rankings**: Toggleable - 1,822 journals
+- **FT50 Rankings**: Toggleable - 50 journals
+- **VHB Rating**: Toggleable - 94 journals
 
 ### Auto-Update Settings
 - **Enable auto-update**: Automatically refresh rankings when viewing items
@@ -161,13 +163,14 @@ zotero-publication-rankings/
 │   │   └── prefs-utils.js           # Preference wrapper utilities
 │   ├── data/
 │   │   └── data.js                  # Rankings databases (32,934 lines)
-│   ├── databases/                    # Database registry & plugins
-│   │   ├── database-registry.js		# Central registry system
-│   │   ├── database-sjr.js			# SJR matching logic (145 lines)
-│   │   ├── database-core.js			# CORE matching logic (47 lines)
-│   │   ├── database-abs.js			# ABS matching logic 
-│   │   └── database-ft-50.js			# FT50 matching logic	
-│   ├── engine/                       # Ranking engine
+│   ├── databases/                   # Database registry & plugins
+│   │   ├── database-registry.js	 # Central registry system
+│   │   ├── database-sjr.js			 # SJR matching logic (145 lines)
+│   │   ├── database-core.js		 # CORE matching logic (47 lines)
+│   │   ├── database-abs.js			 # ABS matching logic 
+│   │   ├── database-ft-50.js		 # FT50 matching logic	
+│   │   └── database-vhb.js			 # VHB matching logic	
+│   ├── engine/                      # Ranking engine
 │   │   ├── ranking-engine.js        # Core ranking coordinator (132 lines)
 │   │   └── matching.js              # String normalization & algorithms
 │   ├── ui/                           # User interface components
@@ -181,10 +184,11 @@ zotero-publication-rankings/
 ├── update-scripts/                   # Data extraction scripts
 │   ├── scimagojr 2024.csv           # SJR source data
 │   ├── full_CORE.csv                # CORE source data
-│   ├── extract_sjr.py				# Extract SJR rankings
-│   ├── extract_full_core.py			# Extract CORE rankings
-│   ├── extract_abs.py				# Extract ABS rankings
-│   ├── extract_ft-50.py				# Extract FT50 rankings
+│   ├── extract_sjr.py				 # Extract SJR rankings
+│   ├── extract_full_core.py		 # Extract CORE rankings
+│   ├── extract_abs.py				 # Extract ABS rankings
+│   ├── extract_ft-50.py			 # Extract FT50 rankings
+│   ├── extract_vhb.py  			 # Extract VHB rankings
 │   └── generate_data_js.py          # Combine into data.js
 ├── manifest.json                     # Plugin metadata
 ├── bootstrap.js                      # Plugin lifecycle hooks & module loader (150 lines)
@@ -212,11 +216,12 @@ The plugin uses an extensible modular architecture designed for maintainability 
 - **`prefs-utils.js`** - Preference storage wrapper with observer pattern
 
 #### Data Layer
-- **`data.js`** (32,934 lines) - Ranking databases
+- **`data.js`** (33,028 lines) - Ranking databases
   - `sjrRankings`: 30,818 journals with quartiles (Q1-Q4) and SJR scores
   - `coreRankings`: 2,173 conferences with tiers (A*, A, B, C) and historical editions
   - `absRankings`: 1,822 journals with ranking (1, 2, 3, 4, 4*)
   - `ft50Rankings`: 50 journals
+  - `vhbRankings`: 94 journals (A+, A, B, C, D)
 
 #### Database Registry System
 - **`database-registry.js`** (126 lines) - Central registry for all ranking databases
@@ -249,7 +254,7 @@ The plugin uses an extensible modular architecture designed for maintainability 
 - **`window-manager.js`** (108 lines) - Window lifecycle tracking
   - Manages multiple Zotero windows
   - Cleanup on window close
-- **`ui-utils.js`** (133 lines) - UI formatting helpers
+- **`ui-utils.js`** (278 lines) - UI formatting helpers
   - Color coding: Green (A*/Q1) → Blue (A/Q2) → Orange (B/Q3) → Red (C/Q4)
   - Sort value calculation for proper tier ordering
 
@@ -279,6 +284,7 @@ For detailed architecture documentation, see [ARCHITECTURE.md](ARCHITECTURE.md).
 - **CORE 2023**: [Computing Research and Education](http://portal.core.edu.au/conf-ranks/)
 - **ABS 2024**: [ABS Ranking](https://journalranking.org)
 - **FT50**: [FT50 Ranking](https://www.ft.com/content/3405a512-5cbb-11e1-8f1f-00144feabdc0)
+- **VHB**: [VHB Rating](https://www.vhbonline.org/en/services/vhb-rating-2024)
 
 ## License
 

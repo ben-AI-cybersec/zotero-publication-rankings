@@ -1,6 +1,6 @@
 # Installation Guide
 
-## Publication Rankings for Zotero 7/8
+## Publication Rankings for Zotero 7+
 
 **Author:** Ben Stephens  
 **License:** GNU General Public License v3.0 (GPLv3)  
@@ -11,8 +11,8 @@
 1. **Download the Plugin**
    - The plugin file is: `publication-rankings-x.x.x.xpi`
 
-2. **Install in Zotero 7/8**
-   - Open Zotero 7/8
+2. **Install in Zotero 7+ **
+   - Open Zotero
    - Go to **Tools → Add-ons** (or press Ctrl+Shift+A)
    - Click the **gear icon** (⚙️) in the top-right corner
    - Select **"Install Add-on From File..."**

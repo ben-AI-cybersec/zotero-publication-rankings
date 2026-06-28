@@ -96,6 +96,9 @@ var RankingEngine = {
 						case 'ft50':
 							rank = 'FT50';
 							break;
+						case 'vhb':
+							rank = 'VHB: ' + rank;
+							break;
                     }
 
 					ranking = rank + ' ' + ranking;

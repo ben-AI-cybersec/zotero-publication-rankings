@@ -49,6 +49,18 @@ def generate_data_js():
         print("  ERROR: ft_50_rankings.json not found. Run extract_ft_50.py first.")
         return
     
+    # Load VHB rankings
+    print("Loading VHB rankings...")
+    try:
+        vhb_rankings = ''
+        with open('vhb_rankings.json', 'r', encoding='utf-8') as f:
+            vhb_rankings = f.read()
+    
+        print(f"  Loaded {round(len(vhb_rankings.splitlines())/3) - 1} VHB journal rankings")
+    except FileNotFoundError:
+        print("  ERROR: vhb_rankings.json not found. Run extract_vhb.py first.")
+        return
+
     # Generate data.js file
     output_path = '../src/data/data.js'
     print(f"\nGenerating {output_path}...")
@@ -89,6 +101,14 @@ def generate_data_js():
         f.write(ft_50_rankings)
         f.write(';\n\n');
 
+        # Write VHB rankings
+        f.write('// VHB Rankings\n')
+        f.write('// Total journals: ' + str(round(len(vhb_rankings.splitlines())/3) - 1) + '\n')
+        f.write('var vhbRankings = ')
+        f.write(vhb_rankings)
+        f.write(';\n\n');        
+
+
     # Calculate file size
     import os
     file_size = os.path.getsize(output_path)
@@ -100,7 +120,8 @@ def generate_data_js():
     print(f"  CORE conferences: {len(core_rankings):,}")
     print(f"  ABS journals: {len(abs_rankings):,}")
     print(f"  FT50 journals: {len(ft_50_rankings.splitlines()) - 2}")
-    print(f"  Total entries: {len(sjr_rankings) + len(core_rankings) + len(abs_rankings) + len(ft_50_rankings.splitlines()) - 2:,}")
+    print(f"  VHB journals: {round(len(vhb_rankings.splitlines())/3) - 1}")
+    print(f"  Total entries: {len(sjr_rankings) + len(core_rankings) + len(abs_rankings) + len(ft_50_rankings.splitlines()) - 2 + round(len(vhb_rankings.splitlines())/3) - 1:,}")
     
     print("\nNext steps:")
     print("  1. cd zotero-rankings-plugin")

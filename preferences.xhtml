@@ -1,5 +1,5 @@
 <!--
-  Publication Rankings Plugin for Zotero 7
+  Publication Rankings Plugin for Zotero 7+
   Preferences UI
   
   Copyright (C) 2025 Ben Stephens
@@ -73,11 +73,23 @@
             <label value="Last Update:" />
             <label value="2012" />
         </html:div>
-    </vbox>
+        <!-- VHB -->
+        <checkbox id="publication-rankings-enableVHB"
+                  label="VHB Publication Media Rating (VHB)"
+                  preference="extensions.publication-rankings.enableVHB" />
+        <description style="margin-left: 25px; margin-bottom: 10px;">
+            VHB Publication Media Rating
+        </description>
+        <html:div style="margin-left: 25px; margin-bottom: 10px;">
+            <label value="Source:" />
+            <label is="zotero-text-link" value="VHB Publication Media Rating 2024" href="https://www.vhbonline.org/en/services/vhb-rating-2024" />
+        </html:div>
+        <html:div style="margin-left: 25px; margin-bottom: 20px;">
+            <label value="Last Update:" />
+            <label value="2024" />
+        </html:div>
 
-    <description style="margin-top: 10px; font-style: italic;">
-        Note: Additional databases (JCR, Qualis, ERA) may be added in future versions.
-    </description>
+    </vbox>
 </groupbox>
 
 <groupbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"

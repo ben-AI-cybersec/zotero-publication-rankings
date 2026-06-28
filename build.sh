@@ -1,6 +1,6 @@
 #!/bin/bash
 # Build script to create Zotero plugin XPI file
-# Publication Rankings Plugin for Zotero 7
+# Publication Rankings Plugin for Zotero 7+
 #
 # Copyright (C) 2025 Ben Stephens
 # Licensed under GNU General Public License v3.0 (GPLv3)
@@ -47,6 +47,7 @@ sourceFiles=(
     "src/databases/database-core.js"
     "src/databases/database-abs.js"
     "src/databases/database-ft-50.js"
+    "src/databases/database-vhb.js",
     # Engine
     "src/engine/ranking-engine.js"
     "src/engine/matching.js"
@@ -110,7 +111,7 @@ fileSize=$(stat -c%s "$outputFile" 2>/dev/null || stat --format=%s "$outputFile"
 fileSizeMB=$(awk "BEGIN {printf \"%.2f\", $fileSize/1024/1024}")
 echo -e "\n\033[0;32mSuccess! Created $outputFile ($fileSizeMB MB)\033[0m"
 echo -e "\nTo install:"
-echo "1. Open Zotero 7"
+echo "1. Open Zotero"
 echo "2. Go to Tools -> Add-ons"
 echo "3. Click the gear icon -> 'Install Add-on From File...'"
 echo "4. Select the $outputFile file"

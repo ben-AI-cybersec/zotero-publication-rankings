@@ -130983,3 +130983,290 @@ var ft50Rankings = [
   "the accounting review"
 ];
 
+// VHB Rankings
+// Total journals: 94
+var vhbRankings = {
+  "﻿academy of management annals": {
+    "vhb": "A"
+  },
+  "academy of management perspectives": {
+    "vhb": "B"
+  },
+  "academy of management review": {
+    "vhb": "A+"
+  },
+  "administrative science quarterly": {
+    "vhb": "A+"
+  },
+  "advances in strategic management": {
+    "vhb": "B"
+  },
+  "africa journal of management": {
+    "vhb": "C"
+  },
+  "american economic review": {
+    "vhb": "A+"
+  },
+  "applied psychology": {
+    "vhb": "B"
+  },
+  "asia pacific business review": {
+    "vhb": "C"
+  },
+  "asia pacific journal of management": {
+    "vhb": "C"
+  },
+  "asian business & management": {
+    "vhb": "C"
+  },
+  "australian journal of management": {
+    "vhb": "C"
+  },
+  "baltic journal of management": {
+    "vhb": "C"
+  },
+  "betriebswirtschaftliche forschung und praxis": {
+    "vhb": "C"
+  },
+  "british journal of industrial relations": {
+    "vhb": "B"
+  },
+  "british journal of management": {
+    "vhb": "B"
+  },
+  "business horizons": {
+    "vhb": "C"
+  },
+  "california management review": {
+    "vhb": "B"
+  },
+  "corporate governance: an international review": {
+    "vhb": "B"
+  },
+  "critical perspectives on international business": {
+    "vhb": "C"
+  },
+  "cross cultural & strategic management (ccsm)": {
+    "vhb": "B"
+  },
+  "cross-cultural research": {
+    "vhb": "C"
+  },
+  "dbw die betriebswirtschaft - business administration review": {
+    "vhb": "C"
+  },
+  "die unternehmung - swiss journal of business research and practice": {
+    "vhb": "C"
+  },
+  "econometrica": {
+    "vhb": "A+"
+  },
+  "european journal of cross-cultural competence and management": {
+    "vhb": "C"
+  },
+  "european journal of international management": {
+    "vhb": "B"
+  },
+  "european journal of management": {
+    "vhb": "B"
+  },
+  "european management journal": {
+    "vhb": "B"
+  },
+  "european management review": {
+    "vhb": "B"
+  },
+  "global strategy journal": {
+    "vhb": "A"
+  },
+  "harvard business review": {
+    "vhb": "B"
+  },
+  "the journal of work and policy": {
+    "vhb": "B"
+  },
+  "international business review": {
+    "vhb": "B"
+  },
+  "international journal of business environment": {
+    "vhb": "D"
+  },
+  "international journal of business research": {
+    "vhb": "C"
+  },
+  "international journal of cross cultural management": {
+    "vhb": "C"
+  },
+  "international journal of emerging markets": {
+    "vhb": "C"
+  },
+  "international journal of human resource management": {
+    "vhb": "B"
+  },
+  "international journal of management reviews": {
+    "vhb": "B"
+  },
+  "international journal of strategic management": {
+    "vhb": "D"
+  },
+  "international marketing review": {
+    "vhb": "B"
+  },
+  "international studies of management and organization": {
+    "vhb": "C"
+  },
+  "journal of applied psychology": {
+    "vhb": "A"
+  },
+  "journal of business economics": {
+    "vhb": "B"
+  },
+  "journal of business economics and management": {
+    "vhb": "D"
+  },
+  "journal of business ethics": {
+    "vhb": "B"
+  },
+  "journal of business research": {
+    "vhb": "B"
+  },
+  "journal of cross-cultural psychology": {
+    "vhb": "B"
+  },
+  "journal of east european management studies": {
+    "vhb": "C"
+  },
+  "journal of economics and management strategy": {
+    "vhb": "B"
+  },
+  "journal of general management": {
+    "vhb": "C"
+  },
+  "journal of global marketing": {
+    "vhb": "C"
+  },
+  "journal of global mobility": {
+    "vhb": "C"
+  },
+  "journal of international business policy": {
+    "vhb": "B"
+  },
+  "journal of international business studies": {
+    "vhb": "A"
+  },
+  "journal of international entrepreneurship": {
+    "vhb": "C"
+  },
+  "journal of international management": {
+    "vhb": "B"
+  },
+  "journal of international marketing": {
+    "vhb": "B"
+  },
+  "journal of management": {
+    "vhb": "A"
+  },
+  "journal of management and governance": {
+    "vhb": "C"
+  },
+  "journal of management control": {
+    "vhb": "C"
+  },
+  "journal of management inquiry": {
+    "vhb": "B"
+  },
+  "journal of management studies": {
+    "vhb": "A"
+  },
+  "journal of political economy": {
+    "vhb": "A+"
+  },
+  "journal of world business": {
+    "vhb": "B"
+  },
+  "kyklos": {
+    "vhb": "B"
+  },
+  "long range planning": {
+    "vhb": "B"
+  },
+  "management and organization review": {
+    "vhb": "C"
+  },
+  "management decision": {
+    "vhb": "B"
+  },
+  "management international review": {
+    "vhb": "B"
+  },
+  "management research review": {
+    "vhb": "C"
+  },
+  "management review quarterly": {
+    "vhb": "B"
+  },
+  "management revue - socio-economic studies": {
+    "vhb": "C"
+  },
+  "management science": {
+    "vhb": "A+"
+  },
+  "mit sloan management review": {
+    "vhb": "B"
+  },
+  "multinational business review": {
+    "vhb": "C"
+  },
+  "nature human behaviour": {
+    "vhb": "A"
+  },
+  "omega": {
+    "vhb": "B"
+  },
+  "organization studies": {
+    "vhb": "A"
+  },
+  "plos one": {
+    "vhb": "B"
+  },
+  "problems and perspectives in management": {
+    "vhb": "C"
+  },
+  "review of managerial science": {
+    "vhb": "B"
+  },
+  "scandinavian journal of management": {
+    "vhb": "B"
+  },
+  "schmalenbach journal of business research": {
+    "vhb": "B"
+  },
+  "science": {
+    "vhb": "A+"
+  },
+  "strategic management journal": {
+    "vhb": "A+"
+  },
+  "strategic management review": {
+    "vhb": "B"
+  },
+  "strategy science": {
+    "vhb": "B"
+  },
+  "the leadership quarterly": {
+    "vhb": "A"
+  },
+  "the rand journal of economics": {
+    "vhb": "A"
+  },
+  "thunderbird international business review": {
+    "vhb": "C"
+  },
+  "transnational corporations": {
+    "vhb": "C"
+  },
+  "zeitschrift für management": {
+    "vhb": "C"
+  }
+};
+

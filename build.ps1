@@ -1,5 +1,5 @@
 # Build script to create Zotero plugin XPI file
-# Publication Rankings Plugin for Zotero 7
+# Publication Rankings Plugin for Zotero 9
 #
 # Copyright (C) 2025 Ben Stephens
 # Licensed under GNU General Public License v3.0 (GPLv3)
@@ -50,6 +50,7 @@ $sourceFiles = @(
     "src\databases\database-core.js",
     "src\databases\database-abs.js",
     "src\databases\database-ft-50.js",
+    "src\databases\database-vhb.js",
     # Engine
     "src\engine\ranking-engine.js",
     "src\engine\matching.js",
@@ -105,7 +106,7 @@ Remove-Item $tempDir -Recurse -Force
 $fileSize = (Get-Item $outputFile).Length / 1MB
 Write-Host "`nSuccess! Created $outputFile ($([math]::Round($fileSize, 2)) MB)" -ForegroundColor Green
 Write-Host "`nTo install:"
-Write-Host "1. Open Zotero 7"
+Write-Host "1. Open Zotero 9"
 Write-Host "2. Go to Tools -> Add-ons"
 Write-Host "3. Click the gear icon -> 'Install Add-on From File...'"
 Write-Host "4. Select the $outputFile file"

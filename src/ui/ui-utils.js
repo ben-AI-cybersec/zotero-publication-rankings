@@ -82,7 +82,24 @@ var UIUtils = {
 				break;
 			case "ft50":
 				return '#2E7D32'; // Dark Green
-
+			case "vhb":
+				// VHB Ranking (Green to Red gradient)
+				if (ranking.startsWith('A+')) {
+					return '#2E7D32'; // Dark green (best)
+				};
+				if (ranking.startsWith('A')) {
+					return '#92D050'
+				};
+				if (ranking.startsWith('B')) {
+					return '#0288D1'; // Blue
+				};
+				if (ranking.startsWith('C')) {
+					return '#F57C00'; // Orange
+				};
+				if (ranking.startsWith('D')) {
+					return '#D32F2F'; // Red (lowest)
+				};
+				break;
 			default:
 				// Default for other rankings (TBR, Unranked, etc.)
 				return '#757575'; // Gray
@@ -141,6 +158,12 @@ var UIUtils = {
 				if (ranking.startsWith('2')) return 246;
 				if (ranking.startsWith('1')) return 245;
 
+				// VHB Ranking
+				if (ranking.startsWith('A+')) return 244;
+				if (ranking.startsWith('A')) return 243;
+				if (ranking.startsWith('B')) return 242;
+				if (ranking.startsWith('C')) return 241;
+				if (ranking.startsWith('D')) return 240;
 				break;
 			default:
 				// Other/Unknown rankings
@@ -205,7 +228,7 @@ var UIUtils = {
 				if (ranking === 'Q4') return 'SJR Q4 - Bottom 25% of journals';
 				break;
 			case "abs":
-				// ABS Quantriles
+				// ABS 
 				if (ranking === '4*') return 'ABS 4*';
 				if (ranking === '4') return 'ABS 4';
 				if (ranking === '3') return 'ABS 3';
@@ -214,6 +237,13 @@ var UIUtils = {
 			case "ft50":
 				// FT50
 				return 'Financial Times 50 journal ranking';
+			case "vhb":
+				// VHB
+				if (ranking === 'A+') return 'VHB A+';
+				if (ranking === 'A') return 'VHB A';
+				if (ranking === 'B') return 'VHB B';
+				if (ranking === 'C') return 'VHB C';
+				if (ranking === 'D') return 'VHB D';
 		}
 		return ranking;
 	},

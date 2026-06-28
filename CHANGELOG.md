@@ -113,7 +113,7 @@ Fresh start with renamed plugin architecture to support future expansion beyond 
   - `src/engine/` - Ranking engine and matching algorithms
   - `src/ui/` - UI components (column, menus, windows)
   - `src/actions/` - User actions and manual overrides
-- **Zotero 7 API Compliance**
+- **Zotero 7+ API Compliance**
   - Modern Services API (no deprecated XPCOM)
   - Bootstrap.js lifecycle hooks pattern
   - ItemTreeManager for custom columns
