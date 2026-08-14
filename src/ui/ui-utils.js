@@ -82,6 +82,8 @@ var UIUtils = {
 				break;
 			case "ft50":
 				return '#2E7D32'; // Dark Green
+			case "preprint":
+				return '#D32F2F'; // Red (same warning colour as Q4 / CORE C)
 			case "vhb":
 				// VHB Ranking (Green to Red gradient)
 				if (ranking.startsWith('A+')) {
@@ -165,6 +167,8 @@ var UIUtils = {
 				if (ranking.startsWith('C')) return 241;
 				if (ranking.startsWith('D')) return 240;
 				break;
+			case "preprint":
+				return 60; // Sort just above unknown, well below any real ranking
 			default:
 				// Other/Unknown rankings
 				return 50;
@@ -244,6 +248,8 @@ var UIUtils = {
 				if (ranking === 'B') return 'VHB B';
 				if (ranking === 'C') return 'VHB C';
 				if (ranking === 'D') return 'VHB D';
+			case "preprint":
+				return 'Preprint - not yet peer reviewed';
 		}
 		return ranking;
 	},

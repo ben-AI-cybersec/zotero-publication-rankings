@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "Publication Rankings",
-	"version": "0.3.1",
+	"version": "0.3.2",
 	"description": "Displays journal and conference rankings (SJR, CORE, and more) in a custom Ranking column",
 	"homepage_url": "https://github.com/ben-AI-cybersec/zotero-publication-rankings",
 	"author": "Ben Stephens",

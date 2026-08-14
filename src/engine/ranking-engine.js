@@ -140,10 +140,18 @@ var RankingEngine = {
 				return m;
 			}
 
+			// Flag preprints so they stand out the same way as Q4/Core C (white on red)
+			// renderCell reverses this array before rendering, so pushing last here
+			// makes the PREPRINT badge render first (leftmost), where it won't get clipped
+			const isPreprint = Zotero.ItemTypes.getName(item.itemTypeID) === 'preprint';
+
 			// Extract publication title from various possible fields
 			var publicationTitle = this.extractPublicationTitle(item);
 
 			if (!publicationTitle) {
+				if (isPreprint) {
+					m.push(`preprint,,${UIUtils.getRankingColor('preprint', 'PREPRINT')}`);
+				}
 				return m;
 			}
 
@@ -163,6 +171,9 @@ var RankingEngine = {
 			if (manualOverride) {
 				debugLog(`✓ MANUAL OVERRIDE: "${manualOverride}"`);
 				m.push(`Manual,"${manualOverride}",#757575`);
+				if (isPreprint) {
+					m.push(`preprint,,${UIUtils.getRankingColor('preprint', 'PREPRINT')}`);
+				}
 				return m;
 			}
 			debugLog(`No manual override found`);
@@ -186,6 +197,10 @@ var RankingEngine = {
 
 			if (m.length === 0) {
 				debugLog(`✗ NO MATCH FOUND in any database for "${publicationTitle}"`);
+			}
+
+			if (isPreprint) {
+				m.push(`preprint,,${UIUtils.getRankingColor('preprint', 'PREPRINT')}`);
 			}
 
 			return m;
