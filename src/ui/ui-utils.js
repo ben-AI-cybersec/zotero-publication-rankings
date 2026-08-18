@@ -58,7 +58,7 @@ var UIUtils = {
 				};
 
 				// National Rankings (use purple to distinguish from main tiers)
-				if (ranking.startsWith('Nat ')) {
+				if (ranking.startsWith('Nat') || ranking == "Au") {
 					return '#7B1FA2'; // Purple
 				};
 				break;
