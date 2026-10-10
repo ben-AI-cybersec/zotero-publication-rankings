@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.4.0] - unreleased (in testing)
+## [0.4.0] - 2026-10-11
 - Added ABDC Journal Quality List 2025 (2,648 journals, A*/A/B/C), matched by ISSN first, then title (#18)
 - Added option to turn the MEGA badge on or off (Settings → User Interface)
 - Added MEGA badge in the ranking column for mega-journals (PLOS ONE, Scientific Reports, IEEE Access, Heliyon, ...); list lives in `src/engine/mega-journals.js`
