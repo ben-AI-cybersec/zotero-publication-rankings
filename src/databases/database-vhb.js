@@ -15,23 +15,17 @@ var vhbDatabase = {
 	* @param {Function} debugLog - Debug logging function
 	* @returns {string|null} Ranking string (e.g., "1" or "4*") or N/A if not found
  */
-	match: function (title, debugLog) {
+	match: function (title, debugLog, context) {
 		debugLog(`[VHB] Retrieving ranking from database...`);
 
-		var result = ''
-		for (var rTitle in vhbRankings) {
-			if (title.trim().toLowerCase() == rTitle.trim().toLowerCase()) {
-				debugLog(`[VHB] ✓ Journal Found: "${rTitle}" -> $(vhbRankings[rTitle])`);
-				result = vhbRankings[rTitle].vhb;
-				break;
-            }
-        }
-
-		if ((result == 'N/A') || (!result)) {
-			debugLog('[VHB] Journal NOT found: "${title}"');
+		var key = MatchingUtils.lookup('vhb', vhbRankings, title, debugLog, context);
+		if (!key) {
+			debugLog(`[VHB] Journal NOT found: "${title}"`);
+			return null;
 		}
 
-		return result;
+		debugLog(`[VHB] ✓ Journal Found: "${key}"`);
+		return vhbRankings[key].vhb;
 	}
 }
 
@@ -40,7 +34,7 @@ DatabaseRegistry.register({
 	name: 'VHB Journal Ranking',
 	prefKey: 'enableVHB',
 	priority: 103,
-	matcher: function (title, debugLog) {
-		return vhbDatabase.match(title, debugLog);
+	matcher: function (title, debugLog, context) {
+		return vhbDatabase.match(title, debugLog, context);
     }
 })

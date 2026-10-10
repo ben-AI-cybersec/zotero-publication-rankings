@@ -149,8 +149,10 @@ var ColumnManager = {
 			// Determine the right font colour
 			var bItems = [];
 			content = '';
-			var r = RankingEngine.getRankingArray(item);
-			r.reverse().forEach(function (line) {
+			// Use the cached ranking (copied, since reverse() works in place)
+			var cached = this.rankingCache.get(item.id);
+			var r = Array.isArray(cached) ? cached : RankingEngine.getRankingArray(item);
+			r.slice().reverse().forEach(function (line) {
 				var e = line.split(',');
 				let b = {
 					color: e[2],
@@ -254,16 +256,17 @@ var ColumnManager = {
 	 */
 	sortingKey: function(item) {
 		const itemID = item.id;
-		let ranking;
+		let rankingData;
 		
+		// Same array cache as dataProvider (it must never hold a plain string)
 		if (this.rankingCache.has(itemID)) {
-			ranking = this.rankingCache.get(itemID);
+			rankingData = this.rankingCache.get(itemID);
 		} else {
-			ranking = RankingEngine.getRanking(item);
-			this.rankingCache.set(itemID, ranking);
+			rankingData = RankingEngine.getRankingArray(item, false);
+			this.rankingCache.set(itemID, rankingData);
 		}
 		
-		return UIUtils.getRankingSortValue(itemID, ranking);
+		return UIUtils.getRankingSortValue(itemID, this.formatRankingForDisplay(rankingData));
 	},
 	
 	/**
@@ -356,7 +359,7 @@ var ColumnManager = {
 		if (!rankingData) {
 			return undefined;
 		}
-		return this.formatRankingForDisplay('', rankingData);
+		return this.formatRankingForDisplay(rankingData);
 	},
 	
 	/**

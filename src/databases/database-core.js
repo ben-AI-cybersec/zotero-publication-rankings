@@ -22,7 +22,7 @@ var COREDatabase = {
 		debugLog(`[CORE] Trying CORE database...`);
 		
 		// Delegate to MatchingUtils which has specialized conference matching logic
-		var result = MatchingUtils.matchCoreConference(title, true);
+		var result = MatchingUtils.matchCoreConference(title, debugLog);
 		
 		if (result) {
 			debugLog(`[CORE] ✓ MATCH: ${result}`);

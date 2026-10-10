@@ -28,9 +28,13 @@ def extract_sjr_rankings(csv_file_path, output_file='sjr_rankings.json'):
             try:
                 sjr_float = float(sjr_value.replace(',', '.'))
                 # Store both SJR and quartile
+                # Issn column is e.g. "15424863, 00079235" (print and electronic);
+                # stored without hyphens, comma-separated, for ISSN matching in the plugin
+                issns = [i.strip().upper() for i in row['Issn'].strip('"').split(',')]
                 sjr_dict[title] = {
                     'sjr': sjr_float,
-                    'quartile': quartile if quartile else '-'
+                    'quartile': quartile if quartile else '-',
+                    'issn': ','.join(i for i in issns if len(i) == 8)
                 }
             except ValueError:
                 print(f"Warning: Could not convert SJR value '{sjr_value}' for journal '{title}'")
@@ -58,7 +62,7 @@ def generate_javascript_dict(sjr_dict, output_file='sjr_rankings.js'):
         for i, (title, data) in enumerate(sorted(sjr_dict.items())):
             # Add comma for all lines except the last one
             comma = ',' if i < len(sjr_dict) - 1 else ''
-            f.write(f'    "{title}": {{sjr: {data["sjr"]}, quartile: "{data["quartile"]}"}}{comma}\n')
+            f.write(f'    "{title}": {{sjr: {data["sjr"]}, quartile: "{data["quartile"]}", issn: "{data["issn"]}"}}{comma}\n')
         
         f.write('};\n')
     

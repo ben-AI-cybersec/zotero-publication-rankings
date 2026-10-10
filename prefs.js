@@ -23,6 +23,12 @@ pref("extensions.publication-rankings.enableFT50", true);
 // Enable VHB journal rankings
 pref("extensions.publication-rankings.enableVHB", true);
 
+// Enable ABDC journal quality list
+pref("extensions.publication-rankings.enableABDC", true);
+
+// Show the MEGA caution badge for mega-journals
+pref("extensions.publication-rankings.enableMega", true);
+
 // Disable Badges
 pref("extensions.publication-rankings.enableBadges", false);
 

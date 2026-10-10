@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - unreleased (in testing)
+- Added ABDC Journal Quality List 2025 (2,648 journals, A*/A/B/C), matched by ISSN first, then title (#18)
+- Added option to turn the MEGA badge on or off (Settings → User Interface)
+- Added MEGA badge in the ranking column for mega-journals (PLOS ONE, Scientific Reports, IEEE Access, Heliyon, ...); list lives in `src/engine/mega-journals.js`
+- Matching: items with an ISSN are matched to SJR by ISSN first (SJR data now includes ISSNs)
+- Matching: leading "The" ignored (#8); subtitles and trailing "(...)" handled on both sides, so "MIS Quarterly" and "MIS Quarterly: Management Information Systems" match in SJR, ABS and FT50 (#11)
+- Matching: added `src/data/title-aliases.js` for alternative publication names (#15)
+- Matching: ABS, FT50 and VHB use the same normalized matching as SJR (case, punctuation, accents, "&")
+- Matching: ambiguous short titles (e.g. three journals called "Medicine") are no longer guessed
+- CORE: fewer false matches - generic words ignored, two-way word overlap, best match instead of first, journals no longer matched to conferences, workshops no longer given their parent conference's rank
+- Performance: titles are looked up in prebuilt indexes; ranking a 500-item library is ~40x faster, and the column no longer re-matches on every repaint
+- Fixed FT50 "Accounting, Organizations and Society" stored as "accounting", and VHB's first entry never matching (BOM in the CSV)
+
 ## [0.3.2] - 2026-9-10
 - Added preprint badge and colour code to ranking column
 - Bump Zotero version supported to v 10.x

@@ -1,7 +1,7 @@
 var ft_50_rankings = [
     'academy of management journal',
     'academy of management review',
-    'accounting',
+    'accounting, organizations and society',
     'administrative science quarterly',
     'american economic review',
     'contemporary accounting research',

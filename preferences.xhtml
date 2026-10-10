@@ -88,6 +88,21 @@
             <label value="Last Update:" />
             <label value="2024" />
         </html:div>
+        <!-- ABDC -->
+        <checkbox id="publication-rankings-enableABDC"
+                  label="ABDC Journal Quality List (ABDC)"
+                  preference="extensions.publication-rankings.enableABDC" />
+        <description style="margin-left: 25px; margin-bottom: 10px;">
+            Australian Business Deans Council (ABDC) journal quality ratings (A*, A, B, C)
+        </description>
+        <html:div style="margin-left: 25px; margin-bottom: 10px;">
+            <label value="Source:" />
+            <label is="zotero-text-link" value="ABDC Journal Quality List 2025" href="https://abdc.edu.au/abdc-journal-quality-list/" />
+        </html:div>
+        <html:div style="margin-left: 25px; margin-bottom: 20px;">
+            <label value="Last Update:" />
+            <label value="2025" />
+        </html:div>
 
     </vbox>
 </groupbox>
@@ -103,6 +118,12 @@
                   preference="extensions.publication-rankings.enableBadges" />
         <description style="margin-left: 25px; margin-bottom: 10px;">
             Show ranking badges instead of coloured text.
+        </description>
+        <checkbox id="publication-rankings-enableMega"
+                  label="Flag mega-journals (MEGA)"
+                  preference="extensions.publication-rankings.enableMega" />
+        <description style="margin-left: 25px; margin-bottom: 10px;">
+            Show a MEGA caution badge for broad-scope, high-volume journals that review for soundness rather than novelty (e.g. PLOS ONE, Scientific Reports, IEEE Access).
         </description>
     </vbox>
 </groupbox>

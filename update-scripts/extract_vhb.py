@@ -16,7 +16,8 @@ def extract_VHB_rankings(csv_file_path, output_file='vhb_rankings.json'):
     """
     vhb_dic = {}
     
-    with open(csv_file_path, 'r', encoding='utf-8') as file:
+    # utf-8-sig strips the BOM, which would otherwise be glued to the first title
+    with open(csv_file_path, 'r', encoding='utf-8-sig') as file:
         # CSV here uses , as delimiter
         reader = csv.reader(file, delimiter=',')
         

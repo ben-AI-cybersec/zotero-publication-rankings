@@ -18,7 +18,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global Zotero, DatabaseRegistry, ManualOverrides */
+/* global Zotero, DatabaseRegistry, ManualOverrides, MatchingUtils, MegaJournals, UIUtils, getPref */
 
 /**
  * Ranking matching engine - handles all ranking lookup logic
@@ -44,8 +44,10 @@ var RankingEngine = {
 				return '';
 			}
 			
+			var context = this.getMatchContext(item);
+
 			// Extract publication title from various possible fields
-			var publicationTitle = this.extractPublicationTitle(item);
+			var publicationTitle = this.extractPublicationTitle(item) || context.issnTitle;
 			if (!publicationTitle) {
 				return '';
 			}
@@ -79,7 +81,7 @@ var RankingEngine = {
 				var db = databases[i];
 				debugLog(`Trying database: ${db.name} (priority ${db.priority})`);
 				
-				var rank = db.matcher(normalizedTitle, debugLog);
+				var rank = db.matcher(normalizedTitle, debugLog, context);
 				debugLog(`Matcher in ${db.name} return rank: ${rank}`);
 				if (rank) {
 					debugLog(`✓ FOUND in ${db.name}: ${rank}`);
@@ -98,6 +100,9 @@ var RankingEngine = {
 							break;
 						case 'vhb':
 							rank = 'VHB: ' + rank;
+							break;
+						case 'abdc':
+							rank = 'ABDC: ' + rank;
 							break;
                     }
 
@@ -145,8 +150,10 @@ var RankingEngine = {
 			// makes the PREPRINT badge render first (leftmost), where it won't get clipped
 			const isPreprint = Zotero.ItemTypes.getName(item.itemTypeID) === 'preprint';
 
+			var context = this.getMatchContext(item);
+
 			// Extract publication title from various possible fields
-			var publicationTitle = this.extractPublicationTitle(item);
+			var publicationTitle = this.extractPublicationTitle(item) || context.issnTitle;
 
 			if (!publicationTitle) {
 				if (isPreprint) {
@@ -165,6 +172,9 @@ var RankingEngine = {
 			};
 
 			debugLog(`=== Matching: "${publicationTitle}" ===`);
+			if (context.issnTitle) {
+				debugLog(`ISSN identifies SJR journal "${context.issnTitle}"`);
+			}
 
 			// Check manual overrides first (highest priority)
 			const manualOverride = ManualOverrides.get(publicationTitle);
@@ -187,7 +197,7 @@ var RankingEngine = {
 				var db = databases[i];
 				debugLog(`Trying database: ${db.name} (priority ${db.priority})`);
 
-				var rank = db.matcher(normalizedTitle, debugLog);
+				var rank = db.matcher(normalizedTitle, debugLog, context);
 				if (rank) {
 					debugLog(`✓ FOUND in ${db.name}: ${rank}`);
 					var a = [db.id, rank, UIUtils.getRankingColor(db.id, rank)];
@@ -197,6 +207,13 @@ var RankingEngine = {
 
 			if (m.length === 0) {
 				debugLog(`✗ NO MATCH FOUND in any database for "${publicationTitle}"`);
+			}
+
+			// Flag mega-journals (pushed after the database rankings, so after the
+			// reverse in renderCell it sits at the left, ahead of the ranks)
+			if (getPref('enableMega') && MegaJournals.isMegaJournal(publicationTitle, context)) {
+				debugLog(`Mega-journal: "${publicationTitle}"`);
+				m.push(`mega,,${UIUtils.getRankingColor('mega', 'MEGA')}`);
 			}
 
 			if (isPreprint) {
@@ -211,6 +228,25 @@ var RankingEngine = {
 		}
 	},
 
+
+	/**
+	 * Item details that help matching beyond the title, passed to every database
+	 * - issn: the item's ISSN field ('' if none)
+	 * - issnTitle: SJR journal identified by that ISSN (or null)
+	 * 
+	 * @param {Object} item - Zotero item object
+	 * @returns {Object} Match context
+	 */
+	getMatchContext: function(item) {
+		var issn = '';
+		try {
+			issn = item.getField('ISSN') || '';
+		}
+		catch (e) {
+			// Item type has no ISSN field
+		}
+		return { issn: issn, issnTitle: MatchingUtils.titleFromIssn(issn) };
+	},
 
 	/**
 	 * Extract publication title from item, checking multiple possible fields

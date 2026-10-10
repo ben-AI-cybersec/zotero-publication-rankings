@@ -61,6 +61,16 @@ def generate_data_js():
         print("  ERROR: vhb_rankings.json not found. Run extract_vhb.py first.")
         return
 
+    # Load ABDC rankings
+    print("Loading ABDC rankings...")
+    try:
+        with open('abdc_rankings.json', 'r', encoding='utf-8') as f:
+            abdc_rankings = json.load(f)
+        print(f"  Loaded {len(abdc_rankings)} ABDC journal rankings")
+    except FileNotFoundError:
+        print("  ERROR: abdc_rankings.json not found. Run extract_abdc.py first.")
+        return
+
     # Generate data.js file
     output_path = '../src/data/data.js'
     print(f"\nGenerating {output_path}...")
@@ -108,6 +118,13 @@ def generate_data_js():
         f.write(vhb_rankings)
         f.write(';\n\n');        
 
+        # Write ABDC rankings
+        f.write('// ABDC Journal Quality List\n')
+        f.write('// Total journals: ' + str(len(abdc_rankings)) + '\n')
+        f.write('var abdcRankings = ')
+        json.dump(abdc_rankings, f, indent=2, ensure_ascii=False)
+        f.write(';\n\n')
+
 
     # Calculate file size
     import os
@@ -121,6 +138,7 @@ def generate_data_js():
     print(f"  ABS journals: {len(abs_rankings):,}")
     print(f"  FT50 journals: {len(ft_50_rankings.splitlines()) - 2}")
     print(f"  VHB journals: {round(len(vhb_rankings.splitlines())/3) - 1}")
+    print(f"  ABDC journals: {len(abdc_rankings):,}")
     print(f"  Total entries: {len(sjr_rankings) + len(core_rankings) + len(abs_rankings) + len(ft_50_rankings.splitlines()) - 2 + round(len(vhb_rankings.splitlines())/3) - 1:,}")
     
     print("\nNext steps:")

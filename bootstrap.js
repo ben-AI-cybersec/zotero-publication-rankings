@@ -37,12 +37,14 @@ function loadModules(rootURI) {
 	const modules = [
 		// Data files
 		'data.js',                // Rankings data (from src/data/)
+		'title-aliases.js',       // Alternative publication names (from src/data/)
 
 		// Core utilities
 		'prefs-utils.js',         // Preference utilities (from src/core/)
 
 		// Engine components
 		'matching.js',            // Matching algorithms (from src/engine/)
+		'mega-journals.js',       // Mega-journal list (from src/engine/)
 
 		// Actions
 		'overrides.js',           // Manual overrides (from src/actions/)
@@ -57,6 +59,7 @@ function loadModules(rootURI) {
 		'database-abs.js',		  // ABS database plugin (from src/databases/)	
 		'database-ft-50.js',	  // FT50 database plugin (from src/databases/)
 		'database-vhb.js',		  // VHB database plugin (from src/databases/) 	
+		'database-abdc.js',       // ABDC database plugin (from src/databases/)
 
 		// Engine
 		'ranking-engine.js',      // Core ranking logic (from src/engine/)

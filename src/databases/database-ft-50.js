@@ -15,24 +15,17 @@ var ft50Database = {
 	* @param {Function} debugLog - Debug logging function
 	* @returns {string|null} Ranking string (e.g., "1" or "4*") or N/A if not found
  */
-	match: function (title, debugLog) {
+	match: function (title, debugLog, context) {
 		debugLog(`[FT50] Retrieving ranking from database...`);
 
-		var result = '';
-		for (var ft50Title of ft50Rankings) {
-			debugLog(`[FT50] Retrieved title: "${ft50Title}"`)
-			if (title.trim().toLowerCase() == ft50Title.trim().toLowerCase()) {
-				debugLog(`[FT50] ✓ Journal Found: "${ft50Title}"`);
-				result = ' '; // We use space to signal that there is no additional ranking
-				break;
-			}
-		}
-		
-		if (!result) {
+		var key = MatchingUtils.lookup('ft50', ft50Rankings, title, debugLog, context);
+		if (!key) {
 			debugLog(`[FT50] Journal NOT found: "${title}"`);
+			return null;
 		}
-		
-		return result;
+
+		debugLog(`[FT50] ✓ Journal Found: "${key}"`);
+		return ' '; // We use space to signal that there is no additional ranking;
 	}
 }
 
@@ -41,7 +34,7 @@ DatabaseRegistry.register({
 	name: 'FT50 Journal Ranking',
 	prefKey: 'enableFT50',
 	priority: 102,
-	matcher: function (title, debugLog) {
-		return ft50Database.match(title, debugLog);
+	matcher: function (title, debugLog, context) {
+		return ft50Database.match(title, debugLog, context);
 	}
 })

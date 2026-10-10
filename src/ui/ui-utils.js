@@ -32,7 +32,8 @@ var UIUtils = {
 				};
 				break;
 			case "core":
-				// CORE Conference Rankings (same gradient)
+			case "abdc":
+				// CORE Conference Rankings / ABDC (same gradient)
 				if (ranking === 'A*' || ranking.startsWith('A* ')) {
 					return '#2E7D32'; // Dark green (best)
 				};
@@ -84,6 +85,8 @@ var UIUtils = {
 				return '#2E7D32'; // Dark Green
 			case "preprint":
 				return '#D32F2F'; // Red (same warning colour as Q4 / CORE C)
+			case "mega":
+				return '#B26A00'; // Amber: caution, distinct from the red preprint / Q4 warning
 			case "vhb":
 				// VHB Ranking (Green to Red gradient)
 				if (ranking.startsWith('A+')) {
@@ -120,6 +123,7 @@ var UIUtils = {
 		switch (id) {
 			case "sjr":
 			case "core":
+			case "abdc":
 				// CORE A* = highest
 				if (ranking === 'A*' || ranking.startsWith('A* ')) return 1000;
 
@@ -167,6 +171,8 @@ var UIUtils = {
 				if (ranking.startsWith('C')) return 241;
 				if (ranking.startsWith('D')) return 240;
 				break;
+			case "mega":
+				return 55; // Between unknown and preprint
 			case "preprint":
 				return 60; // Sort just above unknown, well below any real ranking
 			default:
@@ -224,6 +230,9 @@ var UIUtils = {
 				if (ranking === 'C') return 'CORE C - Solid conference';
 				if (ranking.startsWith('Nat')) return 'CORE ' + ranking + ' - National ranking';
 				break;
+			case "abdc":
+				if (['A*', 'A', 'B', 'C'].indexOf(ranking) !== -1) return 'ABDC ' + ranking;
+				break;
 			case "sjr":
 				// SJR quartiles
 				if (ranking === 'Q1') return 'SJR Q1 - Top 25% of journals';
@@ -248,6 +257,8 @@ var UIUtils = {
 				if (ranking === 'B') return 'VHB B';
 				if (ranking === 'C') return 'VHB C';
 				if (ranking === 'D') return 'VHB D';
+			case "mega":
+				return 'Mega-journal - broad scope, high volume, reviewed for soundness rather than novelty';
 			case "preprint":
 				return 'Preprint - not yet peer reviewed';
 		}

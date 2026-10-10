@@ -1,4 +1,5 @@
 var vhb_rankings = [
+    "academy of management annals": {vhb: "A"},
     "academy of management perspectives": {vhb: "B"},
     "academy of management review": {vhb: "A+"},
     "administrative science quarterly": {vhb: "A+"},
@@ -91,6 +92,5 @@ var vhb_rankings = [
     "the rand journal of economics": {vhb: "A"},
     "thunderbird international business review": {vhb: "C"},
     "transnational corporations": {vhb: "C"},
-    "zeitschrift für management": {vhb: "C"},
-    "﻿academy of management annals": {vhb: "A"}
+    "zeitschrift für management": {vhb: "C"}
 };

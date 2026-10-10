@@ -15,23 +15,17 @@ var absDatabase = {
 	* @param {Function} debugLog - Debug logging function
 	* @returns {string|null} Ranking string (e.g., "1" or "4*") or N/A if not found
  */
-	match: function (title, debugLog) {
+	match: function (title, debugLog, context) {
 		debugLog(`[ABS] Retrieving ranking from database...`);
 
-		var result = ''
-		for (var absTitle in absRankings) {
-			if (title.trim().toLowerCase() == absTitle.trim().toLowerCase()) {
-				debugLog(`[ABS] ✓ Journal Found: "${absTitle}" -> $(absRankings[absTitle])`);
-				result = absRankings[absTitle].abs;
-				break;
-            }
-        }
-
-		if ((result == 'N/A') || (!result)) {
-			debugLog('[ABS] Journal NOT found: "${title}"');
+		var key = MatchingUtils.lookup('abs', absRankings, title, debugLog, context);
+		if (!key) {
+			debugLog(`[ABS] Journal NOT found: "${title}"`);
+			return null;
 		}
 
-		return result;
+		debugLog(`[ABS] ✓ Journal Found: "${key}"`);
+		return absRankings[key].abs;
 	}
 }
 
@@ -40,7 +34,7 @@ DatabaseRegistry.register({
 	name: 'ABS Journal Ranking',
 	prefKey: 'enableABS',
 	priority: 101,
-	matcher: function (title, debugLog) {
-		return absDatabase.match(title, debugLog);
+	matcher: function (title, debugLog, context) {
+		return absDatabase.match(title, debugLog, context);
     }
 })

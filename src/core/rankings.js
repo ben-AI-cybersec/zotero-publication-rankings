@@ -40,6 +40,7 @@ ZoteroRankings = {
 	debugModeObserverID: null,
 	databaseObserverIDs: {},  // Store observer IDs for all database preferences
 	enableBadgesObserverID: null, // Stores observer ID for enableBadges preference item
+	enableMegaObserverID: null,   // Stores observer ID for enableMega preference item
 
 	// Initialize plugin - coordinate module initialization and register observers
 	init: async function({ id, version, rootURI }) {
@@ -66,6 +67,7 @@ ZoteroRankings = {
 		// Register preference observers
 		this.debugModeObserverID = registerPrefObserver('debugMode', this.handleDebugModeChange.bind(this));
 		this.enableBadgesObserverID = registerPrefObserver('enableBadges', this.handleBadgesChange.bind(this));
+		this.enableMegaObserverID = registerPrefObserver('enableMega', this.handleMegaChange.bind(this));
 
 		// Register observers for all database preferences
 		this.registerDatabaseObservers();
@@ -157,6 +159,22 @@ ZoteroRankings = {
 		}
     },
 
+	// Handle enableMega changes - clear cache and refresh item trees
+	handleMegaChange: function (value) {
+		Zotero.debug(`MEGA badge ${value ? 'enabled' : 'disabled'}`);
+
+		// Clear the ranking cache so items are re-evaluated
+		ColumnManager.clearAllCache();
+
+		// Refresh all visible item trees to update rankings immediately
+		var windows = Zotero.getMainWindows();
+		for (let win of windows) {
+			if (win.ZoteroPane && win.ZoteroPane.itemsView) {
+				win.ZoteroPane.itemsView.refreshAndMaintainSelection();
+			}
+		}
+	},
+
 
 	// Notifier callback - refresh item tree when items are added/modified (if autoUpdate enabled)
 	notify: async function(event, type, ids, extraData) {
@@ -228,6 +246,12 @@ ZoteroRankings = {
 		// Unregister preference observers
 		if (this.debugModeObserverID) {
 			unregisterPrefObserver(this.debugModeObserverID);
+		}
+		if (this.enableBadgesObserverID) {
+			unregisterPrefObserver(this.enableBadgesObserverID);
+		}
+		if (this.enableMegaObserverID) {
+			unregisterPrefObserver(this.enableMegaObserverID);
 		}
 		
 		// Unregister all database preference observers
